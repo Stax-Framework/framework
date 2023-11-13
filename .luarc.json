@@ -1,0 +1,14 @@
+{
+  "workspace.library": [
+    "./[core]/stax_core/libs/game/fivem"
+  ],
+  "Lua.diagnostics.disable": [
+    "lowercase-global"
+  ],
+  "runtime.nonstandardSymbol": [
+    "`"
+  ],
+  "diagnostics.globals": [
+    "stax_plugin"
+  ]
+}
