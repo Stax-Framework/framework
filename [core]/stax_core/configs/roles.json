@@ -1,0 +1,7 @@
+{
+  "user": { "power": 0 },
+  "moderator": { "power": 25 },
+  "admin": { "power": 50 },
+  "developer": { "power": 75 },
+  "owner": { "power": 100 }
+}
