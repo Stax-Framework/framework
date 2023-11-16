@@ -22,6 +22,7 @@ shared_scripts {
   "libs/shared/classes/singletons/managers/mumblemanager.lua",
   "libs/shared/classes/config.lua",
   "libs/shared/classes/locale.lua",
+  "libs/shared/enums/events.lua",
 
   --- SCRIPTS
   "shared/managers/callbackmanager.lua",
