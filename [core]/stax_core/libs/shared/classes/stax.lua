@@ -1,27 +1,28 @@
 ---@class Stax
 ---@field Config Config | nil
 ---@field Locale Locale | nil
----@field Roleplay table
----@field DeadZone table 
----@field FirstResponse table
 Stax = {
   DefinedEvents = {},
   Config = nil,
   Locale = nil
 }
+Stax.__index = Stax
 
 --- Initializes Stax globally into your plugin
 function Stax.Init()
   local Config = Stax.Config()
   local Locale = Stax.Locale()
 
-  Config.Listen(function(config)
-    Stax.Config = config
-  end)
+  local newStax = {}
+  setmetatable(newStax, Stax)
 
-  Locale.Listen(function(locale)
-    Stax.Locale = locale
-  end)
+  local _configs = GlobalState[GetCurrentResourceName() .. "_configs"]
+  local _locales = GlobalState[GetCurrentResourceName() .. "_locales"]
+
+  newStax.Config = Config.Load(_configs)
+  newStax.Locale = Locale.New(_locales)
+
+  return newStax
 end
 
 --- Only runs the callback code if its ran on the server

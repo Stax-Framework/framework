@@ -119,12 +119,6 @@ end)
 ---@param plugin Plugin
 Events.CreateEvent(PluginEvents.Mounted, function(plugin)
   plugin = Class.Init(plugin, Plugin)
-
-  plugin:SendConfigPlayer(-1)
-  plugin:SendLocalePlayer(-1)
-
-  print("Plugin Mounted... Syncing Client Locales and Configs")
-
   Logger.Success("PluginManager::Mounted", "[(" .. plugin.ResourceName .. ") " .. plugin.Name .. "]")
 end)
 

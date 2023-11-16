@@ -68,9 +68,7 @@ end
 function Plugin:Init(mount)
   Citizen.CreateThread(function()
     self:LoadConfig()
-    self:SendConfig()
-    self:CheckVersion()
-    
+
     mount()
   end)
 end
@@ -78,23 +76,10 @@ end
 --- Fires after the plugin has been mounted
 function Plugin:Mount()
   Citizen.CreateThread(function()
+    self:CheckVersion()
     self:LoadLocale()
-    self:SendLocale()
 
     self.Mounted = true
-
-    --- Watches for when the player is joining
-    ---@param source string
-    ---@param oldSource string
-    Events.CreateEvent("STAX::Core::Server::PlayerJoining", function(source, oldSource)
-      local player = tonumber(source)
-
-      if player then
-        self:SendConfigPlayer(player)
-        self:SendLocalePlayer(player)
-      end
-    end)
-
     Events.Fire("STAX::Core::Server::PluginMounted", self)
   end)
 end
@@ -160,6 +145,11 @@ function Plugin:CheckVersion()
     return
   end
 
+  if not corePlugin.Config then
+    Logger.Warning("Failed to get config", "Couldn't retrieve core plugin config")
+    return
+  end
+
   local coreConfig = Class.Init(corePlugin.Config, Config)
 
   local checkVersion = coreConfig:Get("framework.check_version")
@@ -193,9 +183,8 @@ end
 function Plugin:LoadConfig()
   local p = promise.new()
 
-  local pluginDirectory = GetResourcePath(self.ResourceName) .. "/configs/"
-
-  local files = Directory.Scan(pluginDirectory)
+  local configDirectory = GetResourcePath(self.ResourceName) .. "/configs/"
+  local files = Directory.Scan(configDirectory)
 
   if not files then
     Logger.Warning("Plugin::ConfigLoadFailed", "[(" .. self.ResourceName .. ") " .. self.Name .. "]")
@@ -207,63 +196,55 @@ function Plugin:LoadConfig()
     return nil
   end
 
-  local config = { client = {}, server = {}, shared = {} }
+  local generatedConfig = { client = {}, server = {}, shared = {} }
 
   for a = 1, #files do
     if not string.find(files[a], ".json") then
       break
     end
 
-    local boundary = nil
+    local boundry = nil
     local configKey = nil
     local data = LoadResourceFile(self.ResourceName, "/configs/" .. files[a])
-    local cfg = json.decode(data)
+
+    local cfgData = json.decode(data)
 
     if string.find(files[a], ".client.") then
-      boundary = "client"
+      boundry = "client"
       configKey = string.gsub(files[a], ".client.json", "")
     elseif string.find(files[a], ".server.") then
-      boundary = "server"
+      boundry = "server"
       configKey = string.gsub(files[a], ".server.json", "")
     else
-      boundary = "shared"
+      boundry = "shared"
       configKey = string.gsub(files[a], ".json", "")
     end
 
-    if not config[boundary][configKey] then
-      config[boundary][configKey] = cfg
+    if not generatedConfig[boundry][configKey] then
+      generatedConfig[boundry][configKey] = cfgData
     else
-      for l, _cfgData in pairs(cfg) do
-        config[boundary][configKey][l] = _cfgData
+      for l, _cfg in pairs(cfgData) do
+        generatedConfig[boundry][l] = _cfg
       end
     end
   end
 
-  local serverConfig = Config.Generate({ config.client, config.server, config.shared })
+  local serverConfig = Config.Generate({ generatedConfig.client, generatedConfig.server, generatedConfig.shared })
+  local clientConfig = Config.Generate({ generatedConfig.client, generatedConfig.shared })
 
   self.Config = Config.Load(serverConfig)
-  self.Config.Server = config.server
-  self.Config.Client = config.client
-  self.Config.Shared = config.shared
+  self.Config.Server = generatedConfig.server
+  self.Config.Client = generatedConfig.client
+  self.Config.Shared = generatedConfig.shared
+
+
+  GlobalState[self.ResourceName .. '_configs'] = clientConfig
 
   Logger.Success("Plugin::LoadedConfig", "[(" .. self.ResourceName .. ") " .. self.Name .. "]")
 
   p:resolve()
 
   return Citizen.Await(p)
-end
-
---- Sends the config to the server side
-function Plugin:SendConfig()
-  Events.Fire("STAX::Core::Shared::ConfigListener", self.ResourceName, self.Config)
-end
-
---- Sends the client config to the players client
----@param player number
-function Plugin:SendConfigPlayer(player)
-  local generatedClientConfig = Config.Generate({ self.Config.Shared, self.Config.Client })
-  local clientConfig = Config.Load(generatedClientConfig)
-  Events.FireClient("STAX::Core::Shared::ConfigListener", player, self.ResourceName, clientConfig)
 end
 
 --- Loads the plugins locale language file
@@ -274,6 +255,11 @@ function Plugin:LoadLocale()
 
   if not corePlugin then
     Logger.Error("Plugin::FailedGetCorePlugin", "[(" .. self.ResourceName .. ") " .. self.Name .. "]")
+    return
+  end
+
+  if not corePlugin.Config then
+    Logger.Warning("Failed to get config", "Couldn't retrieve core plugin config")
     return
   end
 
@@ -297,22 +283,13 @@ function Plugin:LoadLocale()
 
   self.Locale = Locale.New(decodedLocale)
 
+  GlobalState[self.ResourceName .. '_locales'] = decodedLocale
+
   Logger.Success("Plugin::LoadedLocale", "[(" .. self.ResourceName .. ") " .. self.Name .. "]")
 
   p:resolve()
 
   return Citizen.Await(p)
-end
-
---- Sends the locale to the server side
-function Plugin:SendLocale()
-  Events.Fire("STAX::Core::Shared::LocaleListener", self.ResourceName, self.Locale)
-end
-
---- Sends the locale to the players client
----@param player number
-function Plugin:SendLocalePlayer(player)
-  Events.FireClient("STAX::Core::Shared::LocaleListener", player, self.ResourceName, self.Locale)
 end
 
 --- Checks if the plugin has metadata key

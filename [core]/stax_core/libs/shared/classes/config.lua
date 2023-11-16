@@ -1,7 +1,5 @@
 local String = Stax.String()
 local Table = Stax.Table()
-local Class = Stax.Class()
-local Events = Stax.Events()
 
 ---@class Config
 ---@field private Storage table
@@ -61,25 +59,6 @@ function Config.Generate(scopes)
   end
 
   return storage
-end
-
---- Creates a listener for the locales that the framework pushes to the plugins client and server
----@param callback fun(config: Config)
-function Config.Listen(callback)
-  local currentResource = GetCurrentResourceName()
-  local isServer = IsDuplicityVersion()
-
-  if isServer then
-    Events.CreateEvent("STAX::Core::Shared::ConfigListener", function(resource, config)
-      if currentResource ~= resource then return end
-      callback(Class.Init(config, Config))
-    end)
-  else
-    Events.CreateNetEvent("STAX::Core::Shared::ConfigListener", function(resource, config)
-      if currentResource ~= resource then return end
-      callback(Class.Init(config, Config))
-    end)
-  end
 end
 
 --- [ SHARED ]
