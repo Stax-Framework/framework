@@ -135,8 +135,14 @@ end
 
 --- Check Plugin Version
 function Plugin:CheckVersion()
-  if not self.Version then print("version doesnt exist") return end
-  if not self.Github then print("github doesn't exist") return end
+  if not self.Version then
+    Logger.Warning("Plugin::Version::NoVersionDefined", "[(" .. self.ResourceName .. ") " .. self.Name .. "]")
+    return
+  end
+  if not self.Github then
+    Logger.Warning("Plugin::Version::NoGithubDefined", "[(" .. self.ResourceName .. ") " .. self.Name .. "]")
+    return
+  end
 
   local corePlugin = PluginManager.Get("stax-core")
 

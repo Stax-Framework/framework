@@ -64,10 +64,5 @@ lua54 'yes'
 --[[ STAX METADATA ]]--
 stax_plugin "stax-core" {
   name = "Stax Core",
-  description = "Stax Framework Core",
-  version = 0.1,
-  github = {
-    username = "Stax-Framework",
-    repository = "stax_core"
-  }
+  description = "Stax Framework Core"
 }
