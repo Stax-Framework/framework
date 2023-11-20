@@ -1,6 +1,6 @@
 {
   "workspace.library": [
-    "./[core]/stax_core/libs/game/fivem"
+    "./[core]/stax_core/libs/lua/fivem"
   ],
   "Lua.diagnostics.disable": [
     "lowercase-global"

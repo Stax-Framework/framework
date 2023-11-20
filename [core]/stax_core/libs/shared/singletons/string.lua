@@ -1,11 +1,10 @@
-local characterSets = {
-  "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-  "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-  "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"
-}
-
 ---@class StringSingleton
-local String = {}
+local String = {
+  _COMPONENT = {
+    NAME = "String",
+    REQUIREMENTS = {}
+  }
+}
 
 --- Interpolates and concatenate's data into a string
 ---@param str string
@@ -45,7 +44,14 @@ end
 ---@param iterations number
 ---@return string
 function String.Random(iterations)
+  local characterSets = {
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"
+  }
+
   math.randomseed(GetGameTimer())
+
   local str = {}
 
   for _ = 1, iterations do
@@ -63,7 +69,7 @@ function String.StripInvalid(str)
   return str
 end
 
---- [ SHARED ]
-function Stax.String()
-  return String
-end
+AddEventHandler("Stax::Core::RetrieveComponent", function(name, callback)
+  if name == String._COMPONENT.NAME then return end
+  return callback(String)
+end)

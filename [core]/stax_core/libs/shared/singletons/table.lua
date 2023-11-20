@@ -1,5 +1,10 @@
 ---@class TableSingleton
-local Table = {}
+local Table = {
+  _COMPONENT = {
+    NAME = "Table",
+    REQUIREMENTS = {}
+  }
+}
 
 --- Copy's a table into a new table
 ---@param t table
@@ -50,7 +55,7 @@ function Table.Map(t, type, returnType, mapping)
   return newTable
 end
 
---- [ SHARED ]
-function Stax.Table()
-  return Table
-end
+AddEventHandler("Stax::Core::RetrieveComponent", function(name, callback)
+  if name ~= Table._COMPONENT.NAME then return end
+  return callback(Table)
+end)
