@@ -13,10 +13,6 @@ async function Find(name, query = {}, options = {}, callback) {
     const collection = db.collection(name);
     const cursor = collection.find(query, options);
 
-    if (await collection.countDocuments(query) === 0) {
-      return callback(false, "No documents found!");
-    }
-
     const documents = await cursor.toArray()
 
     return callback(true, documents);

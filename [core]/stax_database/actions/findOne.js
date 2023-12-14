@@ -13,10 +13,6 @@ async function FindOne(name, query = {}, options = {}, callback) {
     const collection = db.collection(name);
     const document = await collection.findOne(query, options);
 
-    if (!document) {
-      return callback(false, "No document found!");
-    }
-
     return callback(true, document);
   } catch(err) {
     console.error(`[STAX Mongo] : (FindOne)[Error] : ${err}`);

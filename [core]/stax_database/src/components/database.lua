@@ -1,8 +1,9 @@
 local resource_name = GetCurrentResourceName()
 
----@class Database
+---@class StaxDatabase
+---@field INFO ComponentDetails
 local Database = {
-  _COMPONENT = {
+  INFO = {
     NAME = "Database",
     REQUIREMENTS = {}
   }
@@ -261,7 +262,4 @@ function Database.SyncUpdateOne(collection, query, document, options, cb)
   exports[resource_name]:updateOne(collection, query, document, options, cb)
 end
 
-AddEventHandler("Stax::Core::RetrieveComponent", function(name, callback)
-  if name ~= Database._COMPONENT.NAME then return end
-  return callback(Database)
-end)
+Stax.Component.Register(Database)

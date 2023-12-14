@@ -1,9 +1,0 @@
-{
-  "bot": {
-    "token": "BOT_TOKEN",
-    "guild": "GUILD_ID"
-  },
-  "webhooks": {
-    "your-key": "WEBOOK_URL"
-  }
-}

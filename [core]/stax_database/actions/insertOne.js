@@ -1,7 +1,7 @@
 const { connection } = require("../connection.js");
 const config = require("../config.js");
 
-async function InsertOne(name, document, callback) {
+async function InsertOne(name, document, options = {}, callback) {
   const client = await connection();
 
   if (!client) {
@@ -11,7 +11,7 @@ async function InsertOne(name, document, callback) {
   try {
     const db = client.db(config.db);
     const collection = db.collection(name);
-    const result = await collection.insertOne(document);
+    const result = await collection.insertOne(document, options);
 
     return callback(true, result.insertedId);
   } catch(err) {

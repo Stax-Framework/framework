@@ -14,24 +14,26 @@ lua54 'yes'
 
 shared_scripts {
   --- [ LIBS ] ---
-  "libs/shared/classes/stax.lua",
-  "libs/shared/**/*.lua",
+  "libs/stax.lua",
+
+  ---[ COMPONENTS ]
+  "components/shared/**.lua",
 
   --- [ SOURCE ] ---
   "src/shared/**/*.lua",
 }
 
 client_scripts {
-  --- [ LIBS ] ---
-  "libs/client/**/*.lua",
+  ---[ COMPONENTS ]
+  "components/client/**.lua",
 
   --- [ SOURCE ] ---
   "src/client/**/*.lua",
 }
 
 server_scripts {
-    --- [ LIBS ] ---
-    "libs/server/**/*.lua",
+  ---[ COMPONENTS ]
+  "components/server/**.lua",
 
     --- [ SOURCE ] ---
     "src/server/**/*.lua",

@@ -8,7 +8,10 @@ rdr3_warning "I acknowledge that this is a prerelease build of RedM, and I am aw
 
 server_scripts {
   --- [ LIBS ] ---
-  "libs/database.lua",
+  "@stax_core/libs/stax.lua",
+
+  ---[ COMPONENTS ]
+  "src/components/database.lua",
 
   --- [ SOURCE ] ---
   "./config.js",

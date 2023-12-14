@@ -1,6 +1,7 @@
----@class TableSingleton
+---@class StaxTable
+---@field INFO ComponentDetails
 local Table = {
-  _COMPONENT = {
+  INFO = {
     NAME = "Table",
     REQUIREMENTS = {}
   }
@@ -55,7 +56,4 @@ function Table.Map(t, type, returnType, mapping)
   return newTable
 end
 
-AddEventHandler("Stax::Core::RetrieveComponent", function(name, callback)
-  if name ~= Table._COMPONENT.NAME then return end
-  return callback(Table)
-end)
+Stax.Component.Register(Table)

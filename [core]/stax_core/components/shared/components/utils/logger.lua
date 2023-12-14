@@ -1,9 +1,10 @@
----@type StringSingleton
-local String = Stax:GetComponent("String")
+---@type StaxString
+local String
 
----@class LoggerSingleton
+---@class StaxLogger
+---@field INFO ComponentDetails
 local Logger = {
-  _COMPONENT = {
+  INFO = {
     NAME = "Logger",
     REQUIREMENTS = {
       "String"
@@ -44,7 +45,6 @@ function Logger.Warning(action, message)
   print(msg)
 end
 
-AddEventHandler("Stax::Core::RetrieveComponent", function(name, callback)
-  if name ~= Logger._COMPONENT.NAME then return end
-  return callback(Logger)
+Stax.Component.Register(Logger, function (components)
+  String = components["String"]
 end)
