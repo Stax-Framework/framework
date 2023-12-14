@@ -17,17 +17,6 @@ function PlayerManager.Fetch()
 
 end
 
----@type StaxPlayer
-local Player = Stax.Component.Fetch("Player")
-
-Citizen.CreateThread(function()
-  Citizen.Wait(1000)
-
-  local exists = Player.Exists()
-
-  print("Player Exists: " .. tostring(exists))
-end)
-
 exports("PlayerManager_Add", PlayerManager.Add)
 exports("PlayerManaer_Remove", PlayerManager.Remove)
 exports("PlayerManager_Fetch", PlayerManager.Fetch)
