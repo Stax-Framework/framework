@@ -15,8 +15,8 @@ local PlayerData = {
 
 ---@class StaxPlayer
 ---@field INFO ComponentDetails
+---@field Handle number Players Source ID
 ---@field Name string Players Username
----@field Identifiers string[]
 ---@field Data StaxPlayerData
 local Player = {
   INFO = {
@@ -26,6 +26,7 @@ local Player = {
       "Logger"
     }
   },
+  Name = "",
   Data = PlayerData
 }
 Player.__index = Player
@@ -104,11 +105,11 @@ function Player.Fetch(t)
 end
 
 function Player.TriggerEvent(self, event, ...)
-  TriggerClientEvent(event, self.Data.Handle, ...)
+  TriggerClientEvent(event, self.Handle, ...)
 end
 
 function Player.Save(self)
-  print("Saving Player: [" .. tostring(self.Data.Handle) .. "]: " .. tostring(self.Data.Name))
+  print("Saving Player: [" .. tostring(self.Handle) .. "]: " .. tostring(self.Name))
 end
 
 Stax.Component.Register(Player, function(components)
