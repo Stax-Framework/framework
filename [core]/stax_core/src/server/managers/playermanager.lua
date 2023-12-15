@@ -1,5 +1,5 @@
 ---@type StaxLogger
-local Logger = Stax.Component.Fetch("Logger")
+local Logger = Stax.Require("Logger")
 
 local PlayerManager = {
   PLAYERS = {}
