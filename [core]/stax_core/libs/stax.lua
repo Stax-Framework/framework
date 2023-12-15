@@ -43,7 +43,7 @@ end
 ---@param requirements? fun(components: { [string]: any })
 function Component.Register(component, requirements)
   if not component.COMPONENT then
-    print("[STAX]: Couldn't Register Component\n" .. tostring(component))
+    error("[STAX]: Couldn't load component due to missing `COMPONENT` data property")
     return
   end
 
@@ -51,12 +51,11 @@ function Component.Register(component, requirements)
     if name ~= component.COMPONENT.NAME then return end
     next(component.COMPONENT)
   end)
+
   AddEventHandler("Stax::Shared::GetComponent", function(name, next)
     if name ~= component.COMPONENT.NAME then return end
     next(component)
   end)
-
-  print("[STAX]: Registered Component | " .. tostring(component.COMPONENT.NAME), json.encode(component.COMPONENT.REQUIREMENTS or {}))
 
   Citizen.CreateThread(function()
     local requiredComponents = {}
@@ -77,6 +76,7 @@ Stax = {
   --- Variables
   _RegisteredComponents = {},
   _LoadedComponents = {},
+  _LastRegisteredComponent = nil,
 
   --- Internal Components
   Component = Component
@@ -86,6 +86,22 @@ Stax.__index = Stax
 function Stax.Init()
   print("____________________ STAX ____________________")
   print("[" .. GetCurrentResourceName() .. "]: INITIALIZING...")
+end
+
+--- Returns a component from component name
+---@param name string
+---@generic T
+---@return T
+function Stax.Require(name)
+  return Stax.Component.Fetch(name)
+end
+
+--- Registers a component
+---@param component any
+---@param requirements? fun(components: { [string]: any })
+function Stax.Register(component, requirements)
+  Stax._LastRegisteredComponent = os.time()
+  return Stax.Component.Register(component, requirements)
 end
 
 function Stax.LoadConfig()
@@ -98,4 +114,23 @@ end
 
 Citizen.CreateThread(function()
   Stax.Init()
+
+  local function loaded()
+    if not Stax._LastRegisteredComponent then
+      Stax._LastRegisteredComponent = os.time()
+      return false
+    end
+
+    if os.time() > Stax._LastRegisteredComponent + 5 then
+      return true
+    end
+
+    return false
+  end
+
+  while not loaded() do
+    Citizen.Wait(1000)
+  end
+
+  TriggerEvent("Stax::Shared::Ready", GetCurrentResourceName())
 end)
