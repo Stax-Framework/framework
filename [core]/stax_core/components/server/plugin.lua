@@ -1,3 +1,9 @@
+---@type StaxLogger
+local Logger
+
+---@type StaxDirectory
+local Directory
+
 ---@class StaxPluginData
 ---@field public Key string Plugin's unique key
 ---@field public Name string Plugin's name
@@ -13,21 +19,23 @@ local PluginData = {
 ---@class StaxPlugin
 ---@field public COMPONENT ComponentDetails
 ---@field public Resource string Plugin resource name
----@field public Key string Plugin defined key
 ---@field public Data StaxPluginData Plugin data
 local Plugin = {
   COMPONENT = {
     NAME = "Plugin",
-    REQUIREMENTS = {}
+    REQUIREMENTS = {
+      "Logger",
+      "Directory"
+    }
   },
   Resource = "Default_Resource_Name",
-  Key = "Default_Plugin_Key",
   Data = PluginData
 }
 Plugin.__index = Plugin
 
 --- Creates a new instance of a stax plugin
-function Plugin.Register(resource)
+---@return StaxPlugin | nil
+function Plugin.Create(resource)
   local newPlugin = {}
   setmetatable(newPlugin, Plugin)
 
@@ -41,25 +49,115 @@ function Plugin.Register(resource)
     return nil
   end
 
-  print("Registered New Plugin: " .. json.encode(newPlugin, { indent = true }))
+  Citizen.CreateThread(function()
+    local initialized = Plugin.Init(newPlugin)
+    if not initialized then return nil end
+
+    Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Initialized!")
+
+    local loaded = Plugin.Load(newPlugin)
+    if not loaded then return nil end
+
+    Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Loaded!")
+
+    local started = Plugin.Start(newPlugin)
+    if not started then return nil end
+
+    Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Started!")
+  end)
 
   return newPlugin
 end
 
 --- Starts the plugins preinitialization stage
-function Plugin.Start()
+---@return Promise<boolean>
+function Plugin.Init(self)
+  local p = promise.new()
 
+  p:resolve(true)
+
+  return Citizen.Await(p)
 end
 
-function Plugin.Load()
+--- Starts the plugins preinitialization stage
+---@return Promise<boolean>
+function Plugin.Load(self)
+  local p = promise.new()
 
+  Plugin.FetchConfigs(self)
+
+  p:resolve(true)
+
+  return Citizen.Await(p)
 end
 
-function Plugin.Init()
+--- Starts the plugins preinitialization stage
+---@return Promise<boolean>
+function Plugin.Loaded(self)
+  local p = promise.new()
 
+  p:resolve(true)
+
+  return Citizen.Await(p)
 end
 
-function Plugin.Loaded()
+--- Starts the plugins preinitialization stage
+---@return Promise<boolean>
+function Plugin.Start(self)
+  local p = promise.new()
+
+  p:resolve(true)
+
+  return Citizen.Await(p)
+end
+
+--- Fetches configs from a resources configs folder
+function Plugin.FetchConfigs(self)
+  local function _getConfigScope(file)
+    if string.find(file, ".client.") then
+      return "client"
+    elseif string.find(file, ".server.") then
+      return "server"
+    end
+
+    return "shared"
+  end
+
+  local configDirectory = GetResourcePath(self.Resource) .. "/configs/"
+  local files = Directory.Scan(configDirectory)
+
+  if not files then
+    Logger.Warning("Plugin.FetchConfigs", "No configs directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+  end
+
+  if #files < 1 then
+    Logger.Warning("Plugin.FetchConfigs", "No configs found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+  end
+
+  if files then
+    for a = 1, #files do
+      if not string.find(files[a], ".json") then
+        Logger.Warning("Plugin.FetchConfigs", "Only json files should exist in the configs directory " .. self.Data.Name .. " (" .. self.Resource .. ")")
+        break
+      end
+
+      local data = LoadResourceFile(self.Resource, "/configs/" .. files[a])
+      
+      if data then
+        data = json.decode(data)
+      end
+
+      local scope = _getConfigScope(files[a])
+
+      print("[" .. files[a] .. "]: " .. tostring(scope))
+    end
+  end
+
+  Logger.Success("Plugin.FetchConfigs", "End Of Fetching Configs")
+end
+
+--- Fetches locales from a resources locales folder
+function Plugin.FetchLocales(self)
 
 end
 
@@ -120,4 +218,7 @@ function Plugin.FetchInfo(self)
   return true
 end
 
-Stax.Component.Register(Plugin)
+Stax.Register(Plugin, function(components)
+  Logger = components["Logger"]
+  Directory = components["Directory"]
+end)
