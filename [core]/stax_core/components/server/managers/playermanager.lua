@@ -28,4 +28,4 @@ function PlayerManager.Fetch(handle)
   return exports.stax_core:PlayerManager_Fetch(handle)
 end
 
-Stax.Component.Register(PlayerManager)
+Stax.Register(PlayerManager)
