@@ -2,9 +2,9 @@
 local String
 
 ---@class StaxLogger
----@field INFO ComponentDetails
+---@field COMPONENT ComponentDetails
 local Logger = {
-  INFO = {
+  COMPONENT = {
     NAME = "Logger",
     REQUIREMENTS = {
       "String"

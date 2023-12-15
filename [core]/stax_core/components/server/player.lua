@@ -14,12 +14,12 @@ local PlayerData = {
 }
 
 ---@class StaxPlayer
----@field INFO ComponentDetails
+---@field COMPONENT ComponentDetails
 ---@field Handle number Players Source ID
 ---@field Name string Players Username
 ---@field Data StaxPlayerData
 local Player = {
-  INFO = {
+  COMPONENT = {
     NAME = "Player",
     REQUIREMENTS = {
       "Database",

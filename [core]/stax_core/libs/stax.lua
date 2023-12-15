@@ -42,21 +42,26 @@ end
 ---@param component any
 ---@param requirements? fun(components: { [string]: any })
 function Component.Register(component, requirements)
+  if not component.COMPONENT then
+    print("[STAX]: Couldn't Register Component\n" .. tostring(component))
+    return
+  end
+
   AddEventHandler("Stax::Shared::GetComponentDetails", function(name, next)
-    if name ~= component.INFO.NAME then return end
-    next(component.INFO)
+    if name ~= component.COMPONENT.NAME then return end
+    next(component.COMPONENT)
   end)
   AddEventHandler("Stax::Shared::GetComponent", function(name, next)
-    if name ~= component.INFO.NAME then return end
+    if name ~= component.COMPONENT.NAME then return end
     next(component)
   end)
 
-  print("[STAX]: Registered Component | " .. tostring(component.INFO.NAME), json.encode(component.INFO.REQUIREMENTS or {}))
+  print("[STAX]: Registered Component | " .. tostring(component.COMPONENT.NAME), json.encode(component.COMPONENT.REQUIREMENTS or {}))
 
   Citizen.CreateThread(function()
     local requiredComponents = {}
 
-    for _, requiredComponent in pairs(component.INFO.REQUIREMENTS) do
+    for _, requiredComponent in pairs(component.COMPONENT.REQUIREMENTS) do
       requiredComponents[requiredComponent] = Component.Fetch(requiredComponent)
     end
 
@@ -79,7 +84,18 @@ Stax = {
 Stax.__index = Stax
 
 function Stax.Init()
-  local newInstance = {}
-  setmetatable(newInstance, Stax)
-  return newInstance
+  print("____________________ STAX ____________________")
+  print("[" .. GetCurrentResourceName() .. "]: INITIALIZING...")
 end
+
+function Stax.LoadConfig()
+
+end
+
+function Stax.LoadLocale()
+
+end
+
+Citizen.CreateThread(function()
+  Stax.Init()
+end)

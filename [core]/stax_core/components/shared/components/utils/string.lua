@@ -1,7 +1,7 @@
 ---@class StaxString
----@field INFO ComponentDetails
+---@field COMPONENT ComponentDetails
 local String = {
-  INFO = {
+  COMPONENT = {
     NAME = "String",
     REQUIREMENTS = {}
   }

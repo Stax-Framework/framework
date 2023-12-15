@@ -1,7 +1,7 @@
 ---@class StaxTable
----@field INFO ComponentDetails
+---@field COMPONENT ComponentDetails
 local Table = {
-  INFO = {
+  COMPONENT = {
     NAME = "Table",
     REQUIREMENTS = {}
   }
