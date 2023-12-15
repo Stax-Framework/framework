@@ -112,7 +112,7 @@ function Player.Save(self)
   print("Saving Player: [" .. tostring(self.Handle) .. "]: " .. tostring(self.Name))
 end
 
-Stax.Component.Register(Player, function(components)
+Stax.Register(Player, function(components)
   Database = components["Database"]
   Logger = components["Logger"]
 end)
