@@ -35,12 +35,13 @@ server_scripts {
   ---[ COMPONENTS ]
   "components/server/**.lua",
 
-    --- [ SOURCE ] ---
-    "src/server/**/*.lua",
+  --- [ SOURCE ] ---
+  "src/server/**/*.lua",
 }
 
 --[[ STAX METADATA ]]--
 stax_plugin "stax-core" {
   name = "Stax Core",
-  description = "Stax Framework Core"
+  description = "Stax Framework Core",
+  version = 0.1
 }
