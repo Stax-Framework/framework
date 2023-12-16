@@ -44,10 +44,7 @@ function Plugin.Create(resource)
 
   local fetched = Plugin.FetchInfo(newPlugin)
 
-  if not fetched then
-    print("Failed to create plugin instance for resource '" .. tostring(resource) .. "'")
-    return nil
-  end
+  if not fetched then return nil end
 
   Citizen.CreateThread(function()
     local initialized = Plugin.Init(newPlugin)
