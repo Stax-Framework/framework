@@ -50,10 +50,10 @@ end
 --- Event to handle resource starting
 ---@param resource string
 function PluginManager.StaxReady(resource)
-  if GetCurrentResourceName() == resource then
-    Plugin = Stax.Require("Plugin")
-    Logger = Stax.Require("Logger")
-  end
+  if resource ~= GetCurrentResourceName() then return end
+
+  Plugin = Stax.Require("Plugin")
+  Logger = Stax.Require("Logger")
 
   local plugin = Plugin.Create(resource)
 
