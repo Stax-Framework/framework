@@ -1,13 +1,14 @@
 ---@type StaxLogger
 local Logger = Stax.Require("Logger")
 
+---@class StaxPlayerManagerSingleton
 local PlayerManager = {
   PLAYERS = {}
 }
 
 --- Adds a new player instance to the player manager
 ---@param player StaxPlayer
-function PlayerManager.Add(player)
+function PlayerManager.Add(self, player)
   PlayerManager.PLAYERS[player.Handle] = player
   Logger.Success("PlayerManager.Add", "Added " .. tostring(player.Name))
 end
@@ -21,7 +22,7 @@ end
 
 --- Fetches the player instance from the players source
 ---@param handle number
----@return (StaxPlayer | nil)
+---@return (StaxPlayer | nil) StaxPlayer player otherwise nil if one does not exist
 function PlayerManager.Fetch(handle)
   if PlayerManager.PLAYERS[handle] then
     return PlayerManager.PLAYERS[handle]
