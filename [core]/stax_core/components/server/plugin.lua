@@ -52,8 +52,15 @@ function Plugin.Create(resource)
 
     Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Initialized!")
 
-    local loaded = Plugin.Load(newPlugin)
-    if not loaded then return nil end
+    local loaded = false
+
+    Plugin.Load(newPlugin, function(configs, locales)
+      loaded = true
+    end)
+
+    repeat
+      Citizen.Wait(250)
+    until loaded
 
     Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Loaded!")
 
@@ -77,13 +84,20 @@ function Plugin.Init(self)
 end
 
 --- Starts the plugins preinitialization stage
+---@param self StaxPlugin
+---@param results fun(configs: table, locales: table)
 ---@return Promise<boolean>
-function Plugin.Load(self)
+function Plugin.Load(self, results)
   local p = promise.new()
 
-  Plugin.FetchConfigs(self)
+  local configs = Plugin.FetchConfigs(self)
 
-  p:resolve(true)
+  if configs then
+    results(configs, {})
+    return p:resolve(true)
+  else
+    return p:resolve(false)
+  end
 
   return Citizen.Await(p)
 end
@@ -122,6 +136,7 @@ function Plugin.FetchConfigs(self)
 
   local configDirectory = GetResourcePath(self.Resource) .. "/configs/"
   local files = Directory.Scan(configDirectory)
+  local configs = nil
 
   if not files then
     Logger.Warning("Plugin.FetchConfigs", "No configs directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
@@ -132,7 +147,11 @@ function Plugin.FetchConfigs(self)
   end
 
   if files then
+    configs = {}
+
     for a = 1, #files do
+      local fileKey = string.gsub(files[a], ".json", "")
+
       if not string.find(files[a], ".json") then
         Logger.Warning("Plugin.FetchConfigs", "Only json files should exist in the configs directory " .. self.Data.Name .. " (" .. self.Resource .. ")")
         break
@@ -140,22 +159,48 @@ function Plugin.FetchConfigs(self)
 
       local data = LoadResourceFile(self.Resource, "/configs/" .. files[a])
       
-      if data then
+      if type(data) == "string" then
         data = json.decode(data)
       end
 
       local scope = _getConfigScope(files[a])
 
-      print("[" .. files[a] .. "]: " .. tostring(scope))
+      if type(data) == "table" then
+        if not configs[scope] then
+          configs[scope] = {}
+        end
+
+        configs[scope][fileKey] = data
+      end
     end
   end
 
   Logger.Success("Plugin.FetchConfigs", "End Of Fetching Configs")
+
+  return configs
 end
 
 --- Fetches locales from a resources locales folder
 function Plugin.FetchLocales(self)
+  local localeDirectory = GetResourcePath(self.Resource) .. "/locales/"
+  local files = Directory.Scan(localeDirectory)
+  local locales = nil
 
+  if not files then
+    Logger.Warning("Plugin.FetchConfigs", "No configs directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+  end
+
+  if #files < 1 then
+    Logger.Warning("Plugin.FetchConfigs", "No configs found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+  end
+
+  if files then
+    locales = {}
+
+    for a = 1, #files do
+      print(files[a])
+    end
+  end
 end
 
 ---@return boolean
