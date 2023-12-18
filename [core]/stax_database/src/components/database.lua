@@ -1,7 +1,7 @@
 local resource_name = GetCurrentResourceName()
 
 ---@class StaxDatabase
----@field INFO ComponentDetails
+---@field COMPONENT ComponentDetails
 local Database = {
   COMPONENT = {
     NAME = "Database",
