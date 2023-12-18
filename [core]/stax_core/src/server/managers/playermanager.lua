@@ -30,6 +30,17 @@ function PlayerManager.Fetch(handle)
   return nil
 end
 
+--- Event to handle resource starting
+---@param resource string
+function PlayerManager.StaxReady(resource)
+  if resource ~= GetCurrentResourceName() then return end
+
+  Plugin = Stax.Require("Plugin")
+  Logger = Stax.Require("Logger")
+end
+
+AddEventHandler("Stax::Shared::Ready", PlayerManager.StaxReady)
+
 exports("PlayerManager_Add", PlayerManager.Add)
 exports("PlayerManaer_Remove", PlayerManager.Remove)
 exports("PlayerManager_Fetch", PlayerManager.Fetch)
