@@ -1,11 +1,15 @@
 {
-  "connecting_server_not_ready": "Server isn't ready to be connected to yet!",
-  "connecting_identifier_not_found": "We unfortunately couldn't find the required identifier...\nPlease contact us at {support}",
-  "connecting_unable_to_implement_user": "We are unforunately unable to retrieve or create a user account for you...\nPlease try to reconnect!\nContact support at {support}",
-  "connecting_checking_bans": "We are currently checking your bans!",
-  "connecting_banned_message": "You are currently banned from the server! Time Left: {time}",
-  "connecting_bans_checked": "Passed ban checks!",
-  "connecting_server_stats": "Bans: {bans}\nKicks: {kicks}\nWarns: {warns}",
-  "connecting_server_success": "You are connecting to the server!",
-  "connecting_queue_placement": "You are current {place} / {amount} in the queue!"
+  "connections": {
+    "banned": "You have been banned from the server!",
+    "whitelisted": "You are not whitelisted!",
+    "errors": {}
+  },
+  "player": {
+    "created": "Player has been created!",
+    "loaded": "Player has been loaded!",
+    "errors": {
+      "not_found": "Player account has not been found!",
+      "failed_create": "Failed to create a player instance for you. Please reconnect!"
+    }
+  }
 }
