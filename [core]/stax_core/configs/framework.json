@@ -1,0 +1,12 @@
+{
+  "locale": "en",
+  "whitelisted": {
+    "enabled": true
+  },
+  "dev": {
+    "enabled": true
+  },
+  "version": {
+    "enabled": true
+  }
+}
