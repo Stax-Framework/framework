@@ -68,5 +68,14 @@ function PluginManager.OnPluginAdded(plugin)
   Logger.Success("PluginManagaer.OnPluginAdded", tostring(plugin.Data.Name .. " ADDED"))
 end
 
+--- Event to handle client resources to initialize client STAX instance
+---@param resource string
+function PluginManager.OnClientResourceStart(resource)
+  local src = source
+
+  print("[PLUGIN MANAGER]: CLIENT (" .. tostring(src) ") | " .. tostring(resource) .. " has started!")
+end
+
 AddEventHandler("Stax::Shared::Ready", PluginManager.StaxReady)
 AddEventHandler("Stax::Server::PluginAdded", PluginManager.OnPluginAdded)
+RegisterNetEvent("Stax::Client::ResourceStarted", PluginManager.OnClientResourceStart)
