@@ -97,14 +97,15 @@ function Plugin.Load(self, results)
   local p = promise.new()
 
   local configs = Plugin.FetchConfigs(self)
-  local locales = Plugin.FetchLocales(self, configs["shared"]["framework"]["locale"])
 
   if not configs then
-    p:reject(false)
+    return p:reject(false)
   end
 
+  local locales = Plugin.FetchLocales(self, configs["shared"]["framework"]["locale"])
+
   if not locales then
-    p:reject(false)
+   return p:reject(false)
   end
 
   if configs and locales then
@@ -188,6 +189,8 @@ function Plugin.FetchConfigs(self)
     end
   end
 
+  TriggerEvent("Stax::Shared::LoadConfigs", configs)
+
   Logger.Success("Plugin.FetchConfigs", "End Of Fetching Configs")
 
   return configs
@@ -228,6 +231,8 @@ function Plugin.FetchLocales(self, locale)
       end
     end
   end
+
+  TriggerEvent("Stax::Shared::LoadLocales", locales)
 
   return locales
 end
