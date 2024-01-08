@@ -1,5 +1,15 @@
 {
   "locale": "en",
+  "player": {
+    "identifiers": {
+      "primary": "license",
+      "required": [
+        "license",
+        "steam",
+        "discord"
+      ]
+    }
+  },
   "whitelisted": {
     "enabled": true
   },

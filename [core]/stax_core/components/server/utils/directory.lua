@@ -1,10 +1,7 @@
 ---@class StaxDirectory
----@field COMPONENT ComponentDetails
+---@field COMPONENT StaxComponentDetails
 local Directory = {
-  COMPONENT = {
-    NAME = "Directory",
-    REQUIREMENTS = {}
-  }
+  COMPONENT = Stax.Component.Init("Directory")
 }
 
 --- Scans directory for files

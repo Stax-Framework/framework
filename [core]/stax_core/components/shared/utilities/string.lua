@@ -1,10 +1,7 @@
 ---@class StaxString
----@field COMPONENT ComponentDetails
+---@field COMPONENT StaxComponentDetails
 local String = {
-  COMPONENT = {
-    NAME = "String",
-    REQUIREMENTS = {}
-  }
+  COMPONENT = Stax.Component.Init("String")
 }
 
 --- Interpolates and concatenate's data into a string

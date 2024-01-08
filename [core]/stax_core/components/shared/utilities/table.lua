@@ -1,10 +1,7 @@
 ---@class StaxTable
----@field COMPONENT ComponentDetails
+---@field COMPONENT StaxComponentDetails
 local Table = {
-  COMPONENT = {
-    NAME = "Table",
-    REQUIREMENTS = {}
-  }
+  COMPONENT = Stax.Component.Init("Table")
 }
 
 --- Copy's a table into a new table

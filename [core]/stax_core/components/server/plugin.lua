@@ -17,19 +17,13 @@ local PluginData = {
 }
 
 ---@class StaxPlugin
----@field public COMPONENT ComponentDetails
+---@field public COMPONENT StaxComponentDetails
 ---@field public Resource string Plugin resource name
 ---@field public Data StaxPluginData Plugin data
 ---@field public Config { [string]: any }
 ---@field public Locale { [string]: any }
 local Plugin = {
-  COMPONENT = {
-    NAME = "Plugin",
-    REQUIREMENTS = {
-      "Logger",
-      "Directory"
-    }
-  },
+  COMPONENT = Stax.Component.Init("Plugin", { "Logger", "Directory" }),
   Resource = "Default_Resource_Name",
   Data = PluginData
 }
