@@ -11,12 +11,12 @@ server_scripts {
   "@stax_core/libs/stax.lua",
 
   ---[ COMPONENTS ]
-  "src/components/database.lua",
+  "./components/database.lua",
 
   --- [ SOURCE ] ---
-  "./config.js",
-  "./main.js",
-  "./server/connection.js",
-  "./server/actions/*.js",
-  "./server/exports.js",
+  "./connection.js",
+  "./mongo.js",
+  "./gridfs.js",
+  "./exports.js",
+  "./main.js"
 }
