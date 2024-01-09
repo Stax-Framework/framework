@@ -1,9 +1,3 @@
----@type StaxLogger
-local Logger
-
----@type StaxDirectory
-local Directory
-
 ---@class StaxPluginData
 ---@field public Key string Plugin's unique key
 ---@field public Name string Plugin's name
@@ -22,10 +16,14 @@ local PluginData = {
 ---@field public Data StaxPluginData Plugin data
 ---@field public Config { [string]: any }
 ---@field public Locale { [string]: any }
+---@field public Logger StaxLogger?
+---@field public Directory StaxDirectory?
 local Plugin = {
   COMPONENT = Stax.Component.Init("Plugin", { "Logger", "Directory" }),
   Resource = "Default_Resource_Name",
-  Data = PluginData
+  Data = PluginData,
+  Logger = nil,
+  Directory = nil
 }
 Plugin.__index = Plugin
 
@@ -48,7 +46,7 @@ function Plugin.Create(resource)
     local initialized = Plugin.Init(newPlugin)
     if not initialized then return nil end
 
-    Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Initialized!")
+    Plugin.Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Initialized!")
 
     local loaded = false
 
@@ -62,12 +60,12 @@ function Plugin.Create(resource)
       Citizen.Wait(250)
     until loaded
 
-    Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Loaded!")
+    Plugin.Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Loaded!")
 
     local started = Plugin.Start(newPlugin)
     if not started then return nil end
 
-    Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Started!")
+    Plugin.Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Started!")
   end)
 
   return newPlugin
@@ -143,15 +141,15 @@ function Plugin.FetchConfigs(self)
   end
 
   local configDirectory = GetResourcePath(self.Resource) .. "/configs/"
-  local files = Directory.Scan(configDirectory)
+  local files = Plugin.Directory.Scan(configDirectory)
   local configs = nil
 
   if not files then
-    Logger.Warning("Plugin.FetchConfigs", "No configs directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+    Plugin.Logger.Warning("Plugin.FetchConfigs", "No configs directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
   end
 
   if #files < 1 then
-    Logger.Warning("Plugin.FetchConfigs", "No configs found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+    Plugin.Logger.Warning("Plugin.FetchConfigs", "No configs found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
   end
 
   if files then
@@ -161,7 +159,7 @@ function Plugin.FetchConfigs(self)
       local fileKey = string.gsub(files[a], ".json", "")
 
       if not string.find(files[a], ".json") then
-        Logger.Warning("Plugin.FetchConfigs", "Only json files should exist in the configs directory " .. self.Data.Name .. " (" .. self.Resource .. ")")
+        Plugin.Logger.Warning("Plugin.FetchConfigs", "Only json files should exist in the configs directory " .. self.Data.Name .. " (" .. self.Resource .. ")")
         break
       end
 
@@ -185,7 +183,7 @@ function Plugin.FetchConfigs(self)
 
   TriggerEvent("Stax::Shared::LoadConfigs", configs)
 
-  Logger.Success("Plugin.FetchConfigs", "End Of Fetching Configs")
+  Plugin.Logger.Success("Plugin.FetchConfigs", "End Of Fetching Configs")
 
   return configs
 end
@@ -195,15 +193,15 @@ end
 ---@param locale string
 function Plugin.FetchLocales(self, locale)
   local localeDirectory = GetResourcePath(self.Resource) .. "/locales/"
-  local files = Directory.Scan(localeDirectory)
+  local files = self.Directory.Scan(localeDirectory)
   local locales = nil
 
   if not files then
-    Logger.Warning("Plugin.FetchLocales", "No locales directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+    Plugin.Logger.Warning("Plugin.FetchLocales", "No locales directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
   end
 
   if #files < 1 then
-    Logger.Warning("Plugin.FetchLocales", "No locales found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+    Plugin.Logger.Warning("Plugin.FetchLocales", "No locales found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
   end
 
   if files then
@@ -289,6 +287,6 @@ function Plugin.FetchInfo(self)
 end
 
 Stax.Register(Plugin, function(components)
-  Logger = components["Logger"]
-  Directory = components["Directory"]
+  Plugin.Logger = components.Logger
+  Plugin.Directory = components.Directory
 end)

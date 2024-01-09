@@ -8,8 +8,8 @@ local function _add(player)
   table.insert(Singleton.Players, player)
 end
 
-local function _remove(player)
-
+local function _remove(index)
+  table.remove(Singleton.Players, index)
 end
 
 local function _fetch(handle)
@@ -31,14 +31,13 @@ local PlayerManager = {
 --- Adds a new player instance to the player manager
 ---@param player StaxPlayer
 function PlayerManager.Add(player)
-  _add(player)
-  PlayerManager.Logger.Success("PlayerManager.Add", "Added " .. player.Name .. " to PlayerManager")
+  return _add(player)
 end
 
 --- Removes a player instance from the player manager
 ---@param player StaxPlayer
 function PlayerManager.Remove(player)
-  _remove(player)
+  return _remove(player)
 end
 
 --- Fetches the player instance from the players source
