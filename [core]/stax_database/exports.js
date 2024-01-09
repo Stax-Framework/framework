@@ -1,23 +1,15 @@
-const DeleteMany = require("./actions/deleteMany.js");
-const DeleteOne = require("./actions/deleteOne.js");
-const Find = require("./actions/find.js");
-const FindOne = require("./actions/findOne.js");
-const InsertMany = require("./actions/insertMany.js");
-const InsertOne = require("./actions/insertOne.js");
-const ReplaceOne = require("./actions/replaceOne.js");
-const UpdateMany = require("./actions/updateMany.js");
-const UpdateOne = require("./actions/updateOne.js");
+const MongoActions = require("./mongo.js");
 
 function RegisterExports() {
-  global.exports("deleteMany", DeleteMany);
-  global.exports("deleteOne", DeleteOne);
-  global.exports("find", Find);
-  global.exports("findOne", FindOne);
-  global.exports("insertMany", InsertMany);
-  global.exports("insertOne", InsertOne);
-  global.exports("replaceOne", ReplaceOne);
-  global.exports("updateMany", UpdateMany);
-  global.exports("updateOne", UpdateOne);
+  global.exports("deleteMany", MongoActions.DeleteMany);
+  global.exports("deleteOne", MongoActions.DeleteOne);
+  global.exports("find", MongoActions.Find);
+  global.exports("findOne", MongoActions.FindOne);
+  global.exports("insertMany", MongoActions.InsertMany);
+  global.exports("insertOne", MongoActions.InsertOne);
+  global.exports("replaceOne", MongoActions.ReplaceOne);
+  global.exports("updateMany", MongoActions.UpdateMany);
+  global.exports("updateOne", MongoActions.UpdateOne);
 }
 
 module.exports = RegisterExports

@@ -8,6 +8,10 @@ async function CreateConnection() {
       minPoolSize: parseInt(config.pool.min)
     });
 
+    connection.on("commandSucceeded", (e) => {
+      console.log("Mongo Connection Successful | " + e.connectionId);
+    })
+
     return connection;
   } catch(err) {
     console.error(`[STAX Mongo] : [Error] : ${err}`);
@@ -22,7 +26,7 @@ async function CreateFSBucket(name) {
 
     return new GridFSBucket(db, { bucketName: `${config.db}_${name}` });;
   } catch(err) {
-    console.error(`[STAX Mongo] : [Error] : ${err}`);
+    console.error(`[STAX Mongo FSBucket] : [Error] : ${err}`);
     return;
   }
 }

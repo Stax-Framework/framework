@@ -1,4 +1,4 @@
-const config = {
+module.exports = {
   host: GetConvar("stax_db_host", "localhost"),
   port: GetConvar("stax_db_port", "27017"),
   db: GetConvar("stax_db_database", "stax"),
@@ -9,5 +9,3 @@ const config = {
     max: GetConvar("stax_db_pool_max", "20")
   }
 }
-
-module.exports = config
