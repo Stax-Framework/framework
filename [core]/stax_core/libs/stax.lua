@@ -290,8 +290,23 @@ function Stax.Init(self)
     AddEventHandler("onClientResourceStart", HandleResourceStart)
   end
 
-  Stax.LoadConfig(self)
-  Stax.LoadLocale(self)
+  local configLoaded = false
+  local localeLoaded = false
+
+  Stax.LoadConfig(self, function()
+    TriggerEvent("Stax::Shared::ConfigsLoaded")
+  end)
+  Stax.LoadLocale(self, function()
+    TriggerEvent("Stax::Shared::LocalesLoaded")
+  end)
+
+  Citizen.CreateThread(function()
+    repeat
+      Citizen.Wait(1000)
+    until configLoaded == true and localeLoaded == true
+
+    TriggerEvent("Stax::Shared::Ready")
+  end)
 end
 
 --- Returns if the the current scope is the server
@@ -336,7 +351,7 @@ function Stax.Require(name, result)
   return Stax.Component.Fetch(name, result)
 end
 
-function Stax.LoadConfig(self)
+function Stax.LoadConfig(self, loaded)
   local event
 
   local function _load(configs)
@@ -344,6 +359,7 @@ function Stax.LoadConfig(self)
 
     if event then
       RemoveEventHandler(event)
+      loaded()
     end
   end
 
@@ -354,7 +370,7 @@ function Stax.LoadConfig(self)
   end
 end
 
-function Stax.LoadLocale(self)
+function Stax.LoadLocale(self, loaded)
   local event
 
   local function _load(locales)
@@ -362,6 +378,7 @@ function Stax.LoadLocale(self)
 
     if event then
       RemoveEventHandler(event)
+      loaded()
     end
   end
 
@@ -370,6 +387,18 @@ function Stax.LoadLocale(self)
   else
     event = RegisterNetEvent("Stax::Shared::LoadLocales", _load)
   end
+end
+
+function Stax.OnConfigsLoaded(callback)
+  AddEventHandler("Stax::Shared::ConfigsLoaded", callback)
+end
+
+function Stax.OnLocalesLoaded(callback)
+  AddEventHandler("Stax::Shared::LocalesLoaded", callback)
+end
+
+function Stax.Ready(callback)
+  AddEventHandler("Stax::Shared::Ready", callback)
 end
 
 Stax.Init(Stax)
