@@ -1,0 +1,10 @@
+{
+  "dannewton": {
+    "name": "Dan Newton",
+    "model": "U_M_O_OLDCAJUN_01",
+    "skill": "stamina",
+    "ui": {
+      "headshot": "dannewton.png"
+    }
+  }
+}
