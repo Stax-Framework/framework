@@ -1,4 +1,7 @@
 {
+  "server": {
+    "max_players": 32
+  },
   "locale": "en",
   "player": {
     "identifiers": {
