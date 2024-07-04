@@ -1,7 +1,7 @@
 local resource_name = GetCurrentResourceName()
 
 ---@class StaxDatabase
----@field COMPONENT StaxComponentDetails
+---@field COMPONENT ComponentDetails
 local Database = {
   COMPONENT = Stax.Component.Init("Database")
 }
@@ -259,4 +259,4 @@ function Database.SyncUpdateOne(collection, query, document, options, cb)
   exports[resource_name]:updateOne(collection, query, document, options, cb)
 end
 
-Stax.Register(Database)
+Stax.Component.Register(Database)

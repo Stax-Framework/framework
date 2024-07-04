@@ -28,6 +28,16 @@ function Plugin.New(resource)
 
     newPlugin.Resource = resource
     newPlugin.Data = PluginData
+    newPlugin.Config = {}
+    newPlugin.Locale = {}
+
+    local fetched = Plugin.FetchInfo(newPlugin)
+
+    if not fetched then return nil end
+
+    Citizen.CreateThread(function()
+        --- INITIALIZE PLUGIN
+    end)
 end
 
 ---@return boolean
