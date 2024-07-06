@@ -12,11 +12,32 @@ author 'Xander1998'
 
 lua54 'yes'
 
-shared_scripts {}
+shared_scripts {
+    --- [ LIBS ] ---
+    "libs/stax.lua",
 
-client_scripts {}
+    ---[ COMPONENTS ]
+    "components/shared/**.lua",
 
-server_scripts {}
+    --- [ SOURCE ] ---
+    "src/shared/**/*.lua",
+}
+
+client_scripts {
+    ---[ COMPONENTS ]
+    "components/client/**/*.lua",
+
+    --- [ SOURCE ] ---
+    "src/client/**/*.lua",
+}
+
+server_scripts {
+    ---[ COMPONENTS ]
+    "components/server/**/*.lua",
+
+    --- [ SOURCE ] ---
+    "src/server/**/*.lua",
+}
 
 stax_plugin "stax-core" {
     name = "Stax Core",

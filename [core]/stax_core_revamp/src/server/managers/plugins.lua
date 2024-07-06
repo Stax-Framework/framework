@@ -40,22 +40,32 @@ function Manager._fetch(type, name)
     end
 end
 
-function Manager._fetchResource()
+---@param resource string
+function Manager._onStart(resource)
+    ---@type Plugin | nil
+    local Plugin = Stax.Component.FetchAsync("Plugin")
 
+    if Plugin then
+        local newPlugin = Plugin.New(resource)
+
+        if newPlugin then
+            Manager._add(newPlugin)
+        end
+    end
 end
 
-function Manager._onStart()
-    
+function Manager._onStop(resource)
+    local plugin = Manager._fetch("resource", resource)
+
+    if plugin then
+      Manager._remove(plugin)
+    end
 end
 
-function Manager._onStop()
-
-end
-
-AddEventHandler("onResourceStart", function()
-
+AddEventHandler("onResourceStart", function(resource)
+    Manager._onStart(resource)
 end)
 
-AddEventHandler("onResourceStop", function()
-
+AddEventHandler("onResourceStop", function(resource)
+    Manager._onStop(resource)
 end)

@@ -211,27 +211,17 @@ function Component.Register(component, request)
         Citizen.CreateThread(function()
             local required = {}
 
-            for _, name in pairs(component) do
-                
+            for _, componentName in pairs(component.COMPONENT.REQUIREMENTS) do
+              local fetchedComponent = Stax.Component.FetchAsync(componentName)
+      
+              assert(fetchedComponent ~= nil, "Failed trying to fetch component " .. componentName .. " for " .. component.COMPONENT.NAME)
+              
+              required[componentName] = fetchedComponent
             end
+
+            request(required)
         end)
     end
-end
-
---- Fetches a component 
----@generic T
----@param name string
----@param result fun(component: Component)
-function Component.Fetch(name, result)
-    Stax.FireEvent("STAX::SHARED::GetComponent", name, function(component)
-        result(component)
-    end)
-end
-
---- Fetches a components details 
----
-function Component.FetchDetails(name, details)
-
 end
 
 --- Fetches a component asynchronously
