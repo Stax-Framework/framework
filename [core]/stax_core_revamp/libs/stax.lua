@@ -172,6 +172,49 @@ function Config.Fetch(self, path)
     return result
 end
 
+---@class System
+---@field loaded boolean
+local System = {
+    loaded = false
+}
+System.__index = System
+
+function System.Init(dependencies, result)
+    local newSystem = {
+        loaded = false
+    }
+    setmetatable(newSystem, System)
+
+    System.Register(newSystem, dependencies, result)
+
+    repeat
+        Citizen.Wait(500)
+    until Stax.System.Loaded(newSystem) == true
+
+    return newSystem
+end
+
+function System.Loaded(self)
+    return self.loaded
+end
+
+function System.Register(self, dependencies, result)
+    Citizen.CreateThread(function()
+        local required = {}
+
+        for _, componentName in pairs(dependencies) do
+          local fetchedComponent = Stax.Component.FetchAsync(componentName)
+
+          assert(fetchedComponent ~= nil, "Failed trying to fetch component " .. componentName .. " for " .. componentName)
+
+          required[componentName] = fetchedComponent
+        end
+
+        result(required)
+        self.loaded = true
+    end)
+end
+
 ---@class ComponentDetails
 ---@field NAME string Component Name
 ---@field REQUIREMENTS string[]
@@ -260,6 +303,7 @@ Stax = {
     _Resource = GetCurrentResourceName(),
 
     --- INTERNAL COMPONENTS
+    System = System,
     Component = Component,
     Config = Config,
     Locale = Locale

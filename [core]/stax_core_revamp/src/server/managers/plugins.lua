@@ -1,4 +1,11 @@
----@class PluginManager
+---@type Logger
+local Logger = nil
+
+Stax.System.Init({ "Logger" }, function(results)
+    Logger = results["Logger"]
+end)
+
+---@class PluginManagerSource
 ---@field Plugins { [string]: Plugin }
 local Manager = {
     Plugins = {}
@@ -50,6 +57,8 @@ function Manager._onStart(resource)
 
         if newPlugin then
             Manager._add(newPlugin)
+
+            Logger.Success("Hello_World", "Hello_World")
         end
     end
 end
@@ -62,10 +71,11 @@ function Manager._onStop(resource)
     end
 end
 
-AddEventHandler("onResourceStart", function(resource)
-    Manager._onStart(resource)
-end)
+---[[ EVENTS ]]---
+AddEventHandler("onResourceStart", Manager._onStart)
+AddEventHandler("onResourceStop", Manager._onStop)
 
-AddEventHandler("onResourceStop", function(resource)
-    Manager._onStop(resource)
-end)
+---[[ EXPORTS ]]---
+exports("PluginManager_Add", Manager._add)
+exports("PluginManager_Remove", Manager._remove)
+exports("PluginManager_Fetch", Manager._fetch)
