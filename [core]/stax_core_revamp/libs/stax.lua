@@ -179,17 +179,11 @@ local System = {
 }
 System.__index = System
 
-function System.Init(dependencies, result)
+function System.Init()
     local newSystem = {
         loaded = false
     }
     setmetatable(newSystem, System)
-
-    System.Register(newSystem, dependencies, result)
-
-    repeat
-        Citizen.Wait(500)
-    until Stax.System.Loaded(newSystem) == true
 
     return newSystem
 end
@@ -199,20 +193,20 @@ function System.Loaded(self)
 end
 
 function System.Register(self, dependencies, result)
-    Citizen.CreateThread(function()
-        local required = {}
+    local required = {}
 
+    if #dependencies > 0 then
         for _, componentName in pairs(dependencies) do
-          local fetchedComponent = Stax.Component.FetchAsync(componentName)
+            local fetchedComponent = Stax.Component.FetchAsync(componentName)
 
-          assert(fetchedComponent ~= nil, "Failed trying to fetch component " .. componentName .. " for " .. componentName)
+            assert(fetchedComponent ~= nil, "Failed trying to fetch component " .. componentName .. " for " .. componentName)
 
-          required[componentName] = fetchedComponent
+            required[componentName] = fetchedComponent
         end
+    end
 
-        result(required)
-        self.loaded = true
-    end)
+    result(required)
+    self.loaded = true
 end
 
 ---@class ComponentDetails
@@ -236,16 +230,19 @@ end
 function Component.Register(component, request)
     assert(component.COMPONENT ~= nil, "Failed to register component because ^1`COMPONENT`^0 is not defined")
 
-    AddEventHandler("STAX::SHARED::GetComponentDetails", function(name, next)
-        if name ~= component.COMPONENT.NAME then return end
+    local GetComponentEvent = tostring("STAX::SHARED::GetComponent::" .. component.COMPONENT.NAME)
+    local GetComponentDetailsEvent = tostring("STAX::SHARED::GetComponentDetails::" .. component.COMPONENT.NAME)
 
-        next(component.COMPONENT)
-    end)
-
-    AddEventHandler("STAX::SHARED::GetComponent", function(name, next)
+    Stax.RegisterEvent(false, GetComponentEvent, function(name, next)
         if name ~= component.COMPONENT.NAME then return end
 
         next(component)
+    end)
+
+    Stax.RegisterEvent(false, GetComponentDetailsEvent, function(name, next)
+        if name ~= component.COMPONENT.NAME then return end
+
+        next(component.COMPONENT)
     end)
 
     if #component.COMPONENT.REQUIREMENTS > 0 then
@@ -274,8 +271,23 @@ end
 ---@return Promise<T>
 function Component.FetchAsync(name)
     local p = promise.new()
+    local found = false
 
-    Stax.FireEvent("STAX::SHARED::GetComponent", name, function(component)
+    Citizen.CreateThread(function()
+        local time = 0
+
+        repeat
+            Citizen.Wait(100)
+
+            if time > 3000 then
+                p:reject(false)
+            end
+
+            time = time + 100
+        until found
+    end)
+
+    Stax.FireEvent("STAX::SHARED::GetComponent::" .. name, function(component)
         p:resolve(component)
     end)
 
@@ -288,7 +300,7 @@ end
 function Component.FetchDetailsAsync(name)
     local p = promise.new()
 
-    Stax.FireEvent("STAX::SHARED::GetComponentDetails", name, function(details)
+    Stax.FireEvent("STAX::SHARED::GetComponentDetails::" .. name, function(details)
         p:resolve(details)
     end)
 
@@ -329,19 +341,19 @@ function Stax.Init(self)
 
     Stax.Config.Load(Stax.Config, function()
         Stax.FireEvent("STAX::SHARED::ConfigsLoaded")
+        configLoaded = true
     end)
 
     Stax.Locale.Load(Stax.Locale, function()
         Stax.FireEvent("STAX::SHARED::LocalesLoaded")
+        localeLoaded = true
     end)
 
-    Citizen.CreateThread(function()
-        repeat
-          Citizen.Wait(1000)
-        until configLoaded == true and localeLoaded == true
+    repeat
+        Citizen.Wait(1000)
+    until configLoaded == true and localeLoaded == true
 
-        Stax.FireEvent("STAX::SHARED::Ready")
-    end)
+    Stax.FireEvent("STAX::SHARED::Ready", self._Resource)
 end
 
 --- Returns if the the current scope is the client

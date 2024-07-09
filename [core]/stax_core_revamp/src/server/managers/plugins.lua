@@ -1,9 +1,7 @@
+local PluginManager = Stax.System.Init()
+
 ---@type Logger
 local Logger = nil
-
-Stax.System.Init({ "Logger" }, function(results)
-    Logger = results["Logger"]
-end)
 
 ---@class PluginManagerSource
 ---@field Plugins { [string]: Plugin }
@@ -14,7 +12,7 @@ local Manager = {
 ---@param plugin Plugin
 function Manager._add(plugin)
     Manager.Plugins[plugin.Data.Key] = plugin
-    Stax.FireEvent("STAX::SERVER::PluginAdded", plugin) 
+    Stax.FireEvent("STAX::SERVER::PluginAdded", plugin)
 end
 
 ---@param plugin Plugin
@@ -72,10 +70,16 @@ function Manager._onStop(resource)
 end
 
 ---[[ EVENTS ]]---
-AddEventHandler("onResourceStart", Manager._onStart)
-AddEventHandler("onResourceStop", Manager._onStop)
+Stax.RegisterEvent(false, "STAX::SHARED::Ready", Manager._onStart)
+Stax.RegisterEvent(false, "onResourceStop", Manager._onStop)
 
 ---[[ EXPORTS ]]---
 exports("PluginManager_Add", Manager._add)
 exports("PluginManager_Remove", Manager._remove)
 exports("PluginManager_Fetch", Manager._fetch)
+
+---[[ SYSTEM ]]---
+Stax.System.Register(PluginManager, { "Logger" }, function(components)
+    print("REGISTERED STAX SYSTEM PLUGIN MANAGER")
+    Logger = components["Logger"]
+end)

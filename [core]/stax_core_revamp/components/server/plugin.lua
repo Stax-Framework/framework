@@ -45,7 +45,7 @@ function Plugin.New(resource)
 
     Citizen.CreateThread(function()
         local initialized = Plugin.Init(newPlugin)
-        
+
         if not initialized then return nil end
 
         local loaded = promise.new()
@@ -92,7 +92,7 @@ function Plugin.Init(self)
     local p = promise.new()
 
     p:resolve(true)
-    
+
     return Citizen.Await(p)
 end
 
@@ -115,7 +115,7 @@ function Plugin.FetchInfo(self)
         local values = {}
 
         for a = 0, count do
-            values[#values+1] = {
+            values[#values + 1] = {
                 value = GetResourceMetadata(self.Resource, key, a),
                 extra = GetResourceMetadata(self.Resource, key .. "_extra", a)
             }
@@ -155,44 +155,50 @@ function Plugin.FetchLocales(self, locale)
 
     local files = self.Directory.Scan(directory)
     local locales = nil
-  
+
     if not files then
-      Plugin.Logger.Warning("Plugin.FetchLocales", "No locales directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+        Plugin.Logger.Warning("Plugin.FetchLocales",
+            "No locales directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+        return
     end
-  
+
     if #files < 1 then
-      Plugin.Logger.Warning("Plugin.FetchLocales", "No locales found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+        Plugin.Logger.Warning("Plugin.FetchLocales",
+            "No locales found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+        return
     end
-  
+
     if files then
+        Plugin.Logger.Success("Plugin.FetchLocales", "Fetches Plugin Locales | " .. self.COMPONENT)
+
         locales = {}
 
-      for a = 1, #files do
-        local fileKey = string.gsub(files[a], ".json", "")
-  
-        if fileKey == locale then
-          local data = LoadResourceFile(self.Resource, "/locales/" .. files[a])
-       
-          if type(data) == "string" then
-            data = json.decode(data)
-          end
-    
-          if type(data) == "table" then
-            locales = data
-          end
-  
-          break
+        for a = 1, #files do
+            local fileKey = string.gsub(files[a], ".json", "")
+
+            if fileKey == locale then
+                local data = LoadResourceFile(self.Resource, "/locales/" .. files[a])
+
+                if type(data) == "string" then
+                    data = json.decode(data)
+                end
+
+                if type(data) == "table" then
+                    locales = data
+                end
+
+                break
+            end
         end
-      end
     end
 
     if locales then
-        Stax.FireEvent("STAX::SHARED::LoadLocales", locales)
+        Stax.FireEvent("STAX::SHARED::LocalesLoaded", self.Resource, locales)
         Plugin.Logger.Success("Plugin.FetchLocales", "Fetched Locales")
     else
         Plugin.Logger.Error("Plugin.FetchLocales", "Failed to fetch locales!")
     end
-  
+
     return locales
 end
 
@@ -212,11 +218,13 @@ function Plugin.FetchConfigs(self)
     local configs = nil
 
     if not files then
-        Plugin.Logger.Warning("Plugin.FetchConfigs", "No configs directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+        Plugin.Logger.Warning("Plugin.FetchConfigs",
+            "No configs directory found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
     end
 
     if #files < 1 then
-        Plugin.Logger.Warning("Plugin.FetchConfigs", "No configs found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
+        Plugin.Logger.Warning("Plugin.FetchConfigs",
+            "No configs found for " .. self.Data.Name .. " (" .. self.Resource .. ")")
     end
 
     if files then
@@ -231,7 +239,7 @@ function Plugin.FetchConfigs(self)
             end
 
             local data = LoadResourceFile(self.Resource, "/configs/" .. files[a])
-            
+
             if type(data) == "string" then
                 data = json.decode(data)
             end
@@ -248,7 +256,7 @@ function Plugin.FetchConfigs(self)
         end
     end
 
-    Stax.FireEvent("STAX::SHARED::LoadConfigs", configs)
+    Stax.FireEvent("STAX::SHARED::ConfigsLoaded", self.Resource, configs)
 
     if configs then
         Stax.FireEvent("STAX::SHARED::LoadConfigs", configs)
