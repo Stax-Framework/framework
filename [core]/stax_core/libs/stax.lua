@@ -1,192 +1,404 @@
+---@class StaxConfig
+---@field STORAGE { [string]: table }
+local StaxConfig = {
+  STORAGE = {}
+}
+StaxConfig.__index = StaxConfig
+
+function StaxConfig.Init(configs)
+  local newConfig = {
+    STORAGE = {}
+  }
+
+  if configs["server"] then
+    for k, v in pairs(configs["server"]) do
+      newConfig.STORAGE[k] = v
+    end
+  end
+
+  if configs["client"] then
+    for k, v in pairs(configs["client"]) do
+      newConfig.STORAGE[k] = v
+    end
+  end
+  
+  if configs["shared"] then
+    for k, v in pairs(configs["shared"]) do
+      newConfig.STORAGE[k] = v
+    end
+  end
+
+  for k, v in pairs(configs) do
+    if k ~= "shared" and k ~= "client" and k ~= "server" then
+      newConfig.STORAGE[k] = v
+    end
+  end
+
+  setmetatable(newConfig, StaxConfig)
+
+  return newConfig
+end
+
+function StaxConfig:Fetch(path)
+  --- Splits string into a table based on a seperator
+  ---@param passed string
+  ---@param sep string
+  ---@return table
+  local function split(passed, sep)
+    if sep == nil then
+      sep = "%s"
+    end
+    local t={}
+    for str in string.gmatch(passed, "([^"..sep.."]+)") do
+      table.insert(t, str)
+    end
+    return t
+  end
+
+  local function loadStepper(currentData, nextIndex)
+    return currentData[nextIndex]
+  end
+
+  local result = {}
+
+  if not path then
+    return self.STORAGE
+  end
+
+  path = split(path, ".")
+
+  if type(path) == "table" then
+    local lastStep
+
+    for _, v in pairs(path) do
+      local currentStep = loadStepper(self.STORAGE, v)
+
+      if currentStep == nil then
+        return lastStep[v]
+      else
+        lastStep = currentStep
+      end
+    end
+
+    result = lastStep
+  end
+
+  return result
+end
+
+---@class StaxLocale
+---@field STORAGE { [string]: table }
+local StaxLocale = {
+  STORAGE = {}
+}
+StaxLocale.__index = StaxLocale
+
+function StaxLocale.Init(locales)
+  local newLocale = { STORAGE = locales }
+
+  for k, v in pairs(locales) do
+    newLocale.STORAGE[k] = v
+  end
+
+  setmetatable(newLocale, StaxLocale)
+
+  return newLocale
+end
+
+function StaxLocale:Fetch(path)
+  --- Splits string into a table based on a seperator
+  ---@param passed string
+  ---@param sep string
+  ---@return table
+  local function split(passed, sep)
+    if sep == nil then
+      sep = "%s"
+    end
+    local t={}
+    for str in string.gmatch(passed, "([^"..sep.."]+)") do
+      table.insert(t, str)
+    end
+    return t
+  end
+
+  local function loadStepper(currentData, nextIndex)
+    return currentData[nextIndex]
+  end
+
+  local result = {}
+
+  if not path then
+    return self.STORAGE
+  end
+
+  path = split(path, ".")
+
+  if type(path) == "table" then
+    local lastStep
+
+    for _, v in pairs(path) do
+      local currentStep = loadStepper(self.STORAGE, v)
+
+      if currentStep == nil then
+        return lastStep[v]
+      else
+        lastStep = currentStep
+      end
+    end
+
+    result = lastStep
+  end
+
+  return result
+end
+
+---@class StaxComponentDetails
+---@field NAME string Component Name
+---@field REQUIREMENTS string[]
+local StaxComponentDetails = {}
+
+---@class StaxComponent
+---@field Details StaxComponentDetails
+local StaxComponent = {}
+
+function StaxComponent.Init(name, requirements)
+  return {
+    NAME = name,
+    REQUIREMENTS = requirements or {}
+  }
+end
+
+--- Fetches a component asynchronously
+---@async
+---@generic T
+---@param name string Component Name
+---@return Promise<T>
+function StaxComponent.FetchAsync(name)
+  local p = promise.new()
+
+  TriggerEvent("Stax::Shared::GetComponent", name, function(component)
+    return p:resolve(component)
+  end)
+
+  return Citizen.Await(p)
+end
+
+--- Fetches a components data asynchronously
+---@async
+---@return Promise<StaxComponentDetails>
+function StaxComponent.FetchDataAsync(name)
+  local p = promise.new()
+
+  TriggerEvent("Stax::Shared::GetComponentDetails", name, function(component)
+    return p:resolve(component)
+  end)
+
+  return Citizen.Await(p)
+end
+
+--- Fetches a component asynchronously
+---@generic T
+---@param name string Component Name
+---@param result fun(component: T)
+function StaxComponent.Fetch(name, result)
+  TriggerEvent("Stax::Shared::GetComponent", name, function(component)
+    result(component)
+  end)
+end
+
+--- Fetches a components data asynchronously
+---@param name string Component Name
+---@param result fun(component: StaxComponentDetails)
+function StaxComponent.FetchData(name, result)
+  TriggerEvent("Stax::Shared::GetComponentDetails", name, function(details)
+    result(details)
+  end)
+end
+
+--- Registers a component
+---@param component any
+---@param request fun(components: table)?
+function StaxComponent.Register(component, request)
+  assert(component.COMPONENT ~= nil, "Failed to register component because ^1`COMPONENT`^0 is not defined")
+
+  AddEventHandler("Stax::Shared::GetComponentDetails", function(name, next)
+    if name ~= component.COMPONENT.NAME then return end
+    next(component.COMPONENT)
+  end)
+
+  AddEventHandler("Stax::Shared::GetComponent", function(name, next)
+    if name ~= component.COMPONENT.NAME then return end
+    next(component)
+  end)
+
+  if #component.COMPONENT.REQUIREMENTS > 0 then
+    assert(type(request) == "function", "Register methods requires the 'required' parameter to be a function(components)")
+
+    Citizen.CreateThread(function()
+      local requiredComponents = {}
+
+      for _, componentName in pairs(component.COMPONENT.REQUIREMENTS) do
+        local fetchedComponent = Stax.RequireAsync(componentName)
+
+        assert(fetchedComponent ~= nil, "Failed trying to fetch component " .. componentName .. " for " .. component.COMPONENT.NAME)
+
+        requiredComponents[componentName] = fetchedComponent
+      end
+
+      request(requiredComponents)
+    end)
+  end
+
+  print("^9[STAX] ^0Component Registered ^0-[ ^8" .. component.COMPONENT.NAME .. " ^0]- ")
+end
+
 ---@class Stax
-Stax = {}
+---@field _RegisteredComponents { [string]: table }
+---@field _Resource string?
+Stax = {
+  _RegisteredComponents = {},
+  _LoadedComponents = {},
+  _LastRegisterTimestamp = nil,
+  _Resource = nil,
 
----@class Events
-Stax.Events = {}
-
----@class State
-Stax.State = {}
-
----@class Component
----@field private Components table<Component>
----@field private Details ComponentDetails
-Stax.Component = {
-    LoadCount = 0,
-    Components = {}
+  --- INTERNAL COMPONENTS
+  Component = StaxComponent,
+  Config = StaxConfig,
+  Locale = StaxLocale
 }
 
----@class ComponentDetails
----@field NAME string
----@field REQUIRED table<string> 
-Stax.Component.Details = {}
+function Stax.Init(self)
+  self._Resource = GetCurrentResourceName()
 
----@class Config
-Stax.Config = {}
+  print("^9===================================================^0")
+  print(" STAX INITIALIZING (^9" .. self._Resource .. "^0)")
+  print("^9===================================================^0")
 
----@class Locale
-Stax.Locale = {}
+  local function HandleResourceStart(resource)
+    if self._Resource ~= resource then return end
 
----[[ STAX ]]---
-
-function Stax.Initialize()
-    Citizen.CreateThread(function()
-        Stax.Load()
-    end)
-end
-
-function Stax.Load()
-    local p = promise.new()
-
-    
-
-    return Citizen.Await(p)
-end
-
-function Stax.Unload()
-
-end
-
----[[ STAX EVENTS ]]---
-
---- Creates a new event handler
----@param event string event handler name
----@param callback fun(...) event handler callback
----@param networked boolean If 'true' the event can be triggered across the network
-function Stax.Events.Listen(event, callback, networked)
-    if networked then
-        RegisterNetEvent(event, callback)
+    if Stax.Server() then
+      TriggerEvent("Stax::Server::ResourceStarted", resource)
     else
-        AddEventHandler(event, callback)
+      TriggerEvent("Stax::Client::ResourceStarted", resource)
     end
+  end
+
+  if Stax.Server() then
+    AddEventHandler("onServerResourceStart", HandleResourceStart)
+  else
+    AddEventHandler("onClientResourceStart", HandleResourceStart)
+  end
+
+  local configLoaded = false
+  local localeLoaded = false
+
+  Stax.LoadConfig(self, function()
+    TriggerEvent("Stax::Shared::ConfigsLoaded")
+  end)
+  Stax.LoadLocale(self, function()
+    TriggerEvent("Stax::Shared::LocalesLoaded")
+  end)
+
+  Citizen.CreateThread(function()
+    repeat
+      Citizen.Wait(1000)
+    until configLoaded == true and localeLoaded == true
+
+    TriggerEvent("Stax::Shared::Ready")
+  end)
 end
 
---- Fires an event handler
----@param event string event handler name
----@param ... any event arguments
-function Stax.Events.Fire(event, ...)
-    TriggerEvent(event, ...)
+--- Returns if the the current scope is the server
+---@return boolean
+function Stax.Server()
+  return IsDuplicityVersion()
 end
 
---- Fires an event handler on a single client
----@param event string event handler name
----@param player number player id to fire the event on
----@param ... any event arguments
-function Stax.Events.FireClient(event, player, ...)
-    TriggerClientEvent(event, player, ...)
+--- Returns if the the current scope is the client
+---@return boolean
+function Stax.Client()
+  return not IsDuplicityVersion()
 end
 
---- Fires an event handler on multiple clients
----@param event string event handler name
----@param players table<number> table player ids to fire the event on
----@param ... any event arguments
-function Stax.Events.FireClients(event, players, ...)
-    if #players > 1 then
-        for _, player in ipairs(players) do
-            TriggerClientEvent(event, player, ...)
-        end
-    else
-        Stax.Events.FireClient(event, players[1], ...)
-    end
+--- Returns if the current game the code is running on is the same as the one you pass
+---@param game "fxserver" | "fivem" | "libertym" | "redm"
+---@return boolean
+function Stax.Game(game)
+  return GetGameName() == game
 end
 
---- Fires an event handler on the server
----@param event string event handler name
----@param ... any event arguments
-function Stax.Events.FireServer(event, ...)
-    TriggerServerEvent(event, ...)
+--- Registers a new component
+---@param component any
+---@param required? fun(components: { [string]: any })
+function Stax.Register(component, required)
+  return Stax.Component.Register(component, required)
 end
 
----[[ STAX STATE ]]---
---- Gets state from an Entity
----@param id number
----@param key string
----@generic T
----@return T
-function Stax.State.EntityGetState(id, key)
-    ---@diagnostic disable-next-line
-    return Entity(id).state[key]
-end
-
---- Sets state on an Entity
----@param id number
----@param key string
----@param value any
-function Stax.State.EntitySetState(id, key, value)
-    ---@diagnostic disable-next-line
-    Entity(id).state[key] = value
-end
-
---- Gets state from an Player
----@param id number
----@param key string
----@generic T
----@return T
-function Stax.State.PlayerGetState(id, key)
-    ---@diagnostic disable-next-line
-    return Player(id).state[key]
-end
-
---- Sets state on a Player
----@param id number
----@param key string
----@param value any
-function Stax.State.PlayerSetState(id, key, value)
-    ---@diagnostic disable-next-line
-    Player(id).state[key] = value
-end
-
---- Gets localplayer state
----@param key string
----@generic T
----@return T
-function Stax.State.LocalPlayerGetState(key)
-    ---@diagnostic disable-next-line
-    return LocalPlayer.state[key]
-end
-
---- Sets localplayer state
----@param key string
----@param value any
-function Stax.State.LocalPlayerSetState(key, value)
-    ---@diagnostic disable-next-line
-    LocalPlayer.state[key] = value
-end
-
---- Gets global state
----@param key string
----@generic T
----@return T
-function Stax.State.GlobalGetState(key)
-    ---@diagnostic disable-next-line
-    return GlobalState[key]
-end
-
---- Sets global state
----@param key string
----@param value any
-function Stax.State.GlobalSetState(key, value)
-    ---@diagnostic disable-next-line
-    GlobalState[key] = value
-end
-
----[[ STAX COMPONENT ]]---
-
---- Register a component system
----@param component Component
-function  Stax.Component.Register(component, fetched)
-    local event = tostring("stax.components.register." .. component.Details.NAME)
-    Stax.Events.Listen("stax.components.register", function()
-        ---@diagnostic disable-next-line
-        return component
-    end, false)
-end
-
+--- Returns a component from component name
 ---@param name string
-function Stax.Component.Fetch(name)
-    ---@diagnostic disable-next-line
-    return Stax.Events.Fire("stax.components.register." .. name)
+---@generic T
+---@return T
+function Stax.RequireAsync(name)
+  return Stax.Component.FetchAsync(name)
 end
 
-function Stax.Component.FetchMany()
-
+--- Returns a component from component name
+---@param name string
+---@generic T
+---@param result fun(component: T)
+function Stax.Require(name, result)
+  return Stax.Component.Fetch(name, result)
 end
+
+function Stax.LoadConfig(self, loaded)
+  local event
+
+  local function _load(configs)
+    Stax.Config = StaxConfig.Init(configs)
+
+    if event then
+      RemoveEventHandler(event)
+      loaded()
+    end
+  end
+
+  if Stax.Server() then
+    event = AddEventHandler("Stax::Shared::LoadConfigs", _load)
+  else
+    event = RegisterNetEvent("Stax::Shared::LoadConfigs", _load)
+  end
+end
+
+function Stax.LoadLocale(self, loaded)
+  local event
+
+  local function _load(locales)
+    Stax.Locale = StaxLocale.Init(locales)
+
+    if event then
+      RemoveEventHandler(event)
+      loaded()
+    end
+  end
+
+  if Stax.Server() then
+    event = AddEventHandler("Stax::Shared::LoadLocales", _load)
+  else
+    event = RegisterNetEvent("Stax::Shared::LoadLocales", _load)
+  end
+end
+
+function Stax.OnConfigsLoaded(callback)
+  AddEventHandler("Stax::Shared::ConfigsLoaded", callback)
+end
+
+function Stax.OnLocalesLoaded(callback)
+  AddEventHandler("Stax::Shared::LocalesLoaded", callback)
+end
+
+function Stax.Ready(callback)
+  AddEventHandler("Stax::Shared::Ready", callback)
+end
+
+Stax.Init(Stax)
