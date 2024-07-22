@@ -1,7 +1,6 @@
 ---@class StaxPlayer
 ---@field COMPONENT StaxComponent
 ---@field Name string
----@field Database StaxDatabase?
 ---@field Logger StaxLogger?
 local Player = {
   COMPONENT = Stax.Component.Init("Player", {
@@ -26,9 +25,7 @@ function Player.Create(name)
 end
 
 function Player.Save(self)
-  Player.Database.SyncInsertOne("players", { name = self.Name }, nil, function(results)
-    print("Saved player " .. self.Name .. " !!!! " .. json.encode(results))
-  end)
+  
 end
 
 Stax.Register(Player, function(components)
