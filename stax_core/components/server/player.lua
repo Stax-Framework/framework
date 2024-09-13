@@ -24,9 +24,7 @@ function Player.Create(name)
   return newPlayer
 end
 
-function Player.Save(self)
-  
-end
+function Player.Save(self) end
 
 Stax.Register(Player, function(components)
   Player.Database = components.Database

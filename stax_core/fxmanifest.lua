@@ -20,7 +20,7 @@ shared_scripts {
   "components/shared/**.lua",
 
   --- [ SOURCE ] ---
-  -- "src/shared/**/*.lua",
+  "src/shared/**/*.lua",
 }
 
 client_scripts {
@@ -28,7 +28,7 @@ client_scripts {
   "components/client/**.lua",
 
   --- [ SOURCE ] ---
-  -- "src/client/**/*.lua",
+  "src/client/**/*.lua",
 }
 
 server_scripts {
@@ -36,7 +36,7 @@ server_scripts {
   "components/server/**.lua",
 
   --- [ SOURCE ] ---
-  -- "src/server/**/*.lua",
+  "src/server/**/*.lua",
 }
 
 --[[ STAX METADATA ]]--

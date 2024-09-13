@@ -75,3 +75,18 @@ server_export = nil
 
 ---[FXMANIFEST] Unknown to what this does
 provides = nil
+
+---[FXMANIFEST] Unknown to what this does
+provide = nil
+
+---[FXMANIFEST] Experimental FXV2 OAL
+use_experimental_fxv2_oal = nil
+
+---[FXMANIFEST] Creator Name
+name = nil
+
+---[FXMANIFEST] Project License
+license = nil
+
+---[FXMANIFEST] Convar Categories
+convar_category = nil

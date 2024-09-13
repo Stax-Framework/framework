@@ -94,10 +94,14 @@ function Plugin.Load(self, results)
     return p:reject(false)
   end
 
+  if not configs["shared"] or not configs["shared"]["framework"] or not configs["shared"]["framework"]["locale"] then
+    return p:reject(false)
+  end
+
   local locales = Plugin.FetchLocales(self, configs["shared"]["framework"]["locale"])
 
   if not locales then
-   return p:reject(false)
+    return p:reject(false)
   end
 
   if configs and locales then
@@ -164,7 +168,7 @@ function Plugin.FetchConfigs(self)
       end
 
       local data = LoadResourceFile(self.Resource, "/configs/" .. files[a])
-     
+
       if type(data) == "string" then
         data = json.decode(data)
       end

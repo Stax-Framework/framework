@@ -1,9 +1,11 @@
 ---@class StaxPlayerManager
 ---@field COMPONENT StaxComponent
 ---@field Logger StaxLogger?
+---@field Database StaxDatabase?
 local PlayerManager = {
-  COMPONENT = Stax.Component.Init("PlayerManager", { "Logger" }),
-  Logger = nil
+  COMPONENT = Stax.Component.Init("PlayerManager", { "Logger", "Database" }),
+  Logger = nil,
+  Database = nil
 }
 
 --- Adds a new player instance to the player manager

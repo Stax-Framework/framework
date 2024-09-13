@@ -1,0 +1,22 @@
+{
+  "name": "externalsql",
+  "version": "1.0.0",
+  "description": "FiveM MySQL Database Connector",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xander1998/ExternalSQL.git"
+  },
+  "author": "Xander1998",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xander1998/ExternalSQL/issues"
+  },
+  "homepage": "https://github.com/xander1998/ExternalSQL#readme",
+  "dependencies": {
+    "mysql": "^2.18.1"
+  }
+}
