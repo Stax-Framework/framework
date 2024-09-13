@@ -17,6 +17,23 @@ function Table.Copy(t)
   return newTable
 end
 
+--- Deep copy's a table into a new table
+---@param t table
+---@return table
+function Table.DeepCopy(t)
+  local copy = {}
+
+  for k, v in pairs(t) do
+    if type(v) == "table" then
+      v = Table.DeepCopy(v)
+    end
+
+    copy[k] = v
+  end
+
+  return copy
+end
+
 --- Filters table and returns a filtered table
 ---@generic T
 ---@param t `T`[]
