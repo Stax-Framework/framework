@@ -8,11 +8,14 @@ rdr3_warning "I acknowledge that this is a prerelease build of RedM, and I am aw
 
 dependency "yarn"
 
-files "config.json"
-
 server_scripts {
+  --- [ LIBS ] ---
+  "@stax_core/libs/stax.lua",
+
+  ---[ SCRIPTS ]---
   "index.js",
-  "exports.lua"
+  "src/exports.lua",
+  "components/database.lua"
 }
 
 --[[ STAX METADATA ]]--

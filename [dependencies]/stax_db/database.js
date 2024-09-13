@@ -9,10 +9,31 @@ const pool = mysql.createPool({
   user: config.user,
   password: config.password,
   database: config.database
-});
+})
+
+function HandleSlowQuery(startQueryTime, query) {
+  if (startQueryTime) {
+    const endQueryTime = Date.now()
+    const elapsedTime = (endQueryTime - startQueryTime)
+    let message
+
+    if (elapsedTime >= 100) {
+      if (elapsedTime >= 1000) {
+        message = `[STAX QUERY]: (!!!Slow Query Warning!!!) \n| ${Math.floor(elapsedTime / 1000) * 0.1} seconds |\n ${query}`
+      } else {
+        message = `[STAX QUERY]: (!!!Slow Query Warning!!!) \n| ${Math.floor(elapsedTime)} milliseconds |\n ${query}`
+      }
+    }
+  }
+}
 
 function SendQuery(query, data, callback) {
   pool.getConnection((connectionError, connection) => {
+    let startQueryTime
+
+    if (config.dev === "true") {
+      startQueryTime = Date.now()
+    }
 
     // Connection Error
     if (connectionError) {
@@ -21,30 +42,34 @@ function SendQuery(query, data, callback) {
     }
 
     connection.query(query, data, (queryError, data, fields) => {
+
+      if (startQueryTime) {
+        HandleSlowQuery(startQueryTime, query)
+      }
       
       // Query Error
       if (queryError) {
-        callback({ ok: false, results: [], meta: {}, error: queryError });
+        callback({ ok: false, results: [], meta: {}, error: queryError.sqlMessage });
         return;
       }
 
       if (query.includes("SELECT")) {
-        SelectQuery(data, callback, connection);
+        SelectQuery(data, callback, connection, startQueryTime);
         return;
       }
 
       if (query.includes("DELETE")) {
-        DeleteQuery(data, callback, connection);
+        DeleteQuery(data, callback, connection, startQueryTime);
         return;
       }
 
       if (query.includes("UPDATE")) {
-        UpdateQuery(data, callback, connection);
+        UpdateQuery(data, callback, connection, startQueryTime);
         return;
       }
 
       if (query.includes("INSERT")) {
-        InsertQuery(data, callback, connection);
+        InsertQuery(data, callback, connection, startQueryTime);
         return;
       }
 
@@ -54,22 +79,22 @@ function SendQuery(query, data, callback) {
   });
 }
 
-function SelectQuery(data, callback, connection) {
+function SelectQuery(data, callback, connection, startQueryTime) {
   callback({ ok: true, results: data, meta: {} })
   connection.release();
 }
 
-function DeleteQuery(data, callback, connection) {
+function DeleteQuery(data, callback, connection, startQueryTime) {
   callback({ ok: true, results: [], meta: { affectedRows: data.affectedRows, insertId: data.insertId, changedRows: data.changedRows } })
   connection.release();
 }
 
-function UpdateQuery(data, callback, connection) {
+function UpdateQuery(data, callback, connection, startQueryTime) {
   callback({ ok: true, results: [], meta: { affectedRows: data.affectedRows, insertId: data.insertId, changedRows: data.changedRows } })
   connection.release();
 }
 
-function InsertQuery(data, callback, connection) {
+function InsertQuery(data, callback, connection, startQueryTime) {
   callback({ ok: true, results: [], meta: { affectedRows: data.affectedRows, insertId: data.insertId, changedRows: data.changedRows } })
   connection.release();
 }
