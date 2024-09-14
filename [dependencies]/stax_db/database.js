@@ -38,6 +38,7 @@ function SendQuery(query, data, callback) {
     // Connection Error
     if (connectionError) {
       callback({ ok: false, results: [], meta: {}, error: connectionError });
+      connection.end();
       return;
     }
 
@@ -74,29 +75,29 @@ function SendQuery(query, data, callback) {
       }
 
       callback({ ok: true, results: [], meta: {} });
-      connection.release();
+      connection.end()
     })
   });
 }
 
 function SelectQuery(data, callback, connection, startQueryTime) {
   callback({ ok: true, results: data, meta: {} })
-  connection.release();
+  connection.end();
 }
 
 function DeleteQuery(data, callback, connection, startQueryTime) {
   callback({ ok: true, results: [], meta: { affectedRows: data.affectedRows, insertId: data.insertId, changedRows: data.changedRows } })
-  connection.release();
+  connection.end();
 }
 
 function UpdateQuery(data, callback, connection, startQueryTime) {
   callback({ ok: true, results: [], meta: { affectedRows: data.affectedRows, insertId: data.insertId, changedRows: data.changedRows } })
-  connection.release();
+  connection.end();
 }
 
 function InsertQuery(data, callback, connection, startQueryTime) {
   callback({ ok: true, results: [], meta: { affectedRows: data.affectedRows, insertId: data.insertId, changedRows: data.changedRows } })
-  connection.release();
+  connection.end();
 }
 
 // MySQL Pool Events
