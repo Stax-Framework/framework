@@ -25,24 +25,23 @@ Player.__index = Player
 --- Creates a new instance of the player class
 ---@return StaxPlayer | nil
 function Player.Create(playerSource)
-  local newPlayer = {
+  local self = setmetatable({
     Id = 0,
     Name = GetPlayerName(playerSource),
     PrimaryIdentifier = Configs.identifiers.primary,
     Identifiers = {},
     Source = playerSource
-  }
-  setmetatable(newPlayer, Player)
+  }, Player)
 
-  local loaded = newPlayer:Load()
+  local loaded = self:Load()
 
   if not loaded then
     return nil
   end
 
-  newPlayer.Logger.Success("Player.Create", "Created Player: " .. name)
+  self.Logger.Success("Player.Create", "Created Player: " .. name)
 
-  return newPlayer
+  return self
 end
 
 ---@return boolean
@@ -63,7 +62,7 @@ function Player:Load()
 
   if query.ok then
     local results = query.results
-    
+
     if results[1] then
       self.Id = results[1].id
     end

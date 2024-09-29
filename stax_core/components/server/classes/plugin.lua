@@ -30,29 +30,28 @@ Plugin.__index = Plugin
 --- Creates a new instance of a stax plugin
 ---@return StaxPlugin | nil
 function Plugin.Create(resource)
-  local newPlugin = {}
-  setmetatable(newPlugin, Plugin)
+  local self = setmetatable({
+    Resource = resource,
+    Data = PluginData,
+    Config = {},
+    Locale = {}
+  }, Plugin)
 
-  newPlugin.Resource = resource
-  newPlugin.Data = PluginData
-  newPlugin.Config = {}
-  newPlugin.Locale = {}
-
-  local fetched = Plugin.FetchInfo(newPlugin)
+  local fetched = Plugin.FetchInfo(self)
 
   if not fetched then return nil end
 
   Citizen.CreateThread(function()
-    local initialized = Plugin.Init(newPlugin)
+    local initialized = Plugin.Init(self)
     if not initialized then return nil end
 
-    Plugin.Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Initialized!")
+    Plugin.Logger.Success("Plugin.Create", self.Data.Name .. " Initialized!")
 
     local loaded = false
 
-    Plugin.Load(newPlugin, function(configs, locales)
-      newPlugin.Config = configs
-      newPlugin.Locale = locales
+    Plugin.Load(self, function(configs, locales)
+      self.Config = configs
+      self.Locale = locales
       loaded = true
     end)
 
@@ -60,15 +59,15 @@ function Plugin.Create(resource)
       Citizen.Wait(250)
     until loaded
 
-    Plugin.Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Loaded!")
+    Plugin.Logger.Success("Plugin.Create", self.Data.Name .. " Loaded!")
 
-    local started = Plugin.Start(newPlugin)
+    local started = Plugin.Start(self)
     if not started then return nil end
 
-    Plugin.Logger.Success("Plugin.Create", newPlugin.Data.Name .. " Started!")
+    Plugin.Logger.Success("Plugin.Create", self.Data.Name .. " Started!")
   end)
 
-  return newPlugin
+  return self
 end
 
 --- Starts the plugins preinitialization stage
