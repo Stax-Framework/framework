@@ -193,7 +193,7 @@ end
 ---@param locale string
 function Plugin.FetchLocales(self, locale)
   local localeDirectory = GetResourcePath(self.Resource) .. "/locales/"
-  local files = self.Directory.Scan(localeDirectory)
+  local files = Plugin.Directory.Scan(localeDirectory)
   local locales = nil
 
   if not files then

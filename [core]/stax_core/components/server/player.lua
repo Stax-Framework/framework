@@ -13,14 +13,17 @@ local Player = {
 }
 Player.__index = Player
 
+---@param source number
 ---@return StaxPlayer
-function Player.Create(name)
+function Player.Create(source)
   local newPlayer = {
-    Name = name
+    source = source,
+    name = GetPlayerName(source),
+    identifiers = GetPlayerIdentifier(source, "license")
   }
   setmetatable(newPlayer, Player)
 
-  newPlayer.Logger.Success("Player.Create", "Created Player: " .. name)
+  newPlayer.Logger.Success("Player.Create", "Created Player: " .. newPlayer.name)
 
   return newPlayer
 end

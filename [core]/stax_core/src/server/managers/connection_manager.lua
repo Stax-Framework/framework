@@ -1,80 +1,53 @@
 ---@class StaxConnectionManagerSingleton
----@field MaxPlayers number
----@field ConnectedPlayers number
----@field Queue { [string]: { priority: boolean, index: number } }
----@field ThreadStarted boolean
+---@field PlayerManager StaxPlayerManager | nil
+---@field Player StaxPlayer | nil
 local Manager = {
-    MaxPlayers = 0,
-    ConnectedPlayers = 0,
-    Queue = {},
-    ThreadStarted = false,
+    PlayerManager = nil,
+    Player = nil,
+
+    CanConnect = false
 }
 
----@param priorityOnly boolean | nil
-local function _queueCount(priorityOnly)
-    if not priorityOnly then priorityOnly = false end
+function Manager.Connecting(playerName, setKickReason, deferrals)
+    deferrals.defer()
 
-    local count = 0
-
-    for _, v in pairs(Manager.Queue) do
-        if priorityOnly then
-            if v.priority then
-                count = count + 1
-            end
-        else
-            count = count + 1
-        end
+    if not Manager.CanConnect then
+        deferrals.done("Please wait to connect... The server just started!")
+        return
     end
 
-    return count
-end
+    local playerSource = tonumber(source)
 
-local function _stopThread()
-    Manager.ThreadStarted = false
-end
+    if playerSource then
+        -- PlayerManager.Add()
 
-local function _startThread()
-    if Manager.ThreadStarted then return end
-
-    local function _checkQueue()
-        if _queueCount() <= 0 then
-            _stopThread()
-            return
-        end
-
-
+        Manager.Player.Create(playerSource)
+        deferrals.done("Created player kicking for testing")
+    else
+        deferrals.done("Unable to convert source to number")
     end
-
-    Manager.ThreadStarted = true
-
-    Citizen.CreateThread(function()
-        while Manager.ThreadStarted do
-            _checkQueue()
-            Citizen.Wait(1000)
-        end
-    end)
 end
 
-local function _add(handle)
+function Manager.Authenticating()
 
 end
 
-local function _remove()
+function Manager.Initializing()
 
 end
 
-local function _get()
+function Manager.Connect()
 
 end
 
 Stax.Ready(function()
-    local config = Stax.Config:Fetch("framework")
+    Manager.PlayerManager = Stax.RequireAsync("PlayerManager")
+    Manager.Player = Stax.RequireAsync("Player")
 
-    if config then
-        Manager.MaxPlayers = config["server"]["max_players"]
-    end
+    AddEventHandler("playerConnecting", Manager.Connecting)
 
-    AddEventHandler("playerAdded", function()
-    
+    Citizen.CreateThread(function()
+        Citizen.Wait(5000)
+        Manager.CanConnect = true
     end)
 end)

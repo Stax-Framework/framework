@@ -295,9 +295,12 @@ function Stax.Init(self)
 
   Stax.LoadConfig(self, function()
     TriggerEvent("Stax::Shared::ConfigsLoaded")
+    configLoaded = true
   end)
+
   Stax.LoadLocale(self, function()
     TriggerEvent("Stax::Shared::LocalesLoaded")
+    localeLoaded = true
   end)
 
   Citizen.CreateThread(function()
