@@ -75,3 +75,6 @@ server_export = nil
 
 ---[FXMANIFEST] Unknown to what this does
 provides = nil
+
+---[FXMANIFEST] Resource is only a server only resource
+server_only = nil

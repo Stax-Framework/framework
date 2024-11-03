@@ -23,7 +23,7 @@ function Logger.Warning(action, message)
 end
 
 ---@param name string
----@param data table<any>
+---@param data table
 ---@param pretty boolean?
 function Logger.Unpack(name, data, pretty)
   if not name then

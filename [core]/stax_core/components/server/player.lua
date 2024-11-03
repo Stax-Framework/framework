@@ -26,9 +26,9 @@ function Player.Create(name)
 end
 
 function Player.Save(self)
-  Player.Database.SyncInsertOne("players", { name = self.Name }, nil, function(results)
-    print("Saved player " .. self.Name .. " !!!! " .. json.encode(results))
-  end)
+  -- Player.Database.Insert({ collection = "players", documents = {} }, function()
+
+  -- end)
 end
 
 Stax.Register(Player, function(components)
