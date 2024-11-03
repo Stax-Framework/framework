@@ -73,4 +73,8 @@ Stax.Ready(function()
     if config then
         Manager.MaxPlayers = config["server"]["max_players"]
     end
+
+    AddEventHandler("playerAdded", function()
+    
+    end)
 end)
