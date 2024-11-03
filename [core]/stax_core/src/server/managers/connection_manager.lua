@@ -19,9 +19,12 @@ function Manager.Connecting(playerName, setKickReason, deferrals)
     local playerSource = tonumber(source)
 
     if playerSource then
-        -- PlayerManager.Add()
+        local playerInstance = Manager.Player.Create(playerSource)
 
-        Manager.Player.Create(playerSource)
+        if playerInstance then
+            Manager.PlayerManager.Add(playerInstance)
+        end
+        
         deferrals.done("Created player kicking for testing")
     else
         deferrals.done("Unable to convert source to number")
