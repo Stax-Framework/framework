@@ -9,13 +9,13 @@ local Manager = {
 local function _add(player)
   table.insert(Manager.Players, player)
 
-  Manager.Logger.Success("PlayerManager", "Added player " .. player.name .. " to the player manager!")
+  Manager.Logger.Success("PlayerManager", "Added player " .. player.Name .. " to the player manager!")
 end
 
 local function _remove(index)
   table.remove(Manager.Players, index)
 
-  Manager.Logger.Success("PlayerManager", "Removed player " .. Manager.Players[index].name .. " to the player manager!")
+  Manager.Logger.Success("PlayerManager", "Removed player " .. Manager.Players[index].Name .. " to the player manager!")
 end
 
 local function _fetch(handle)

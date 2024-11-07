@@ -74,7 +74,9 @@ function StaxConfig:Fetch(path)
       local currentStep = loadStepper(self.STORAGE, v)
 
       if currentStep == nil then
-        return lastStep[v]
+        if lastStep and lastStep[v] then
+          return lastStep[v]
+        end
       else
         lastStep = currentStep
       end
