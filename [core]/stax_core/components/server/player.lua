@@ -158,5 +158,11 @@ end
 Stax.Register(Player, function(components)
   Player.Database = components.Database
   Player.Logger = components.Logger
-  Player.Groups = Stax.Config:Fetch("permissions")
+end)
+
+Stax.Ready(function()
+  if not Player.Groups then
+    Player.Groups = Stax.Config:Fetch("groups")
+    Player.Logger.Unpack("Player.Groups.Config.READY????", Player.Groups, true)
+  end
 end)
