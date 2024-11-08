@@ -16,7 +16,7 @@ function _G.AddEventHandler(event, callback) end
 --- Client -> Server | Server -> Client
 ---
 ---@param event string
----@param callback fun(...)
+---@param callback? fun(...)
 function _G.RegisterNetEvent(event, callback) end
 
 ---[SHARED] Removes an event handler using its event handler data

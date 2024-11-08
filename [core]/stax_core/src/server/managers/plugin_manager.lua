@@ -8,14 +8,14 @@ local Manager = {
 ---@param plugin StaxPlugin
 local function _add(plugin)
   Manager.Plugins[plugin.Data.Key] = plugin
-  TriggerEvent("Stax::Server::PluginAdded", plugin)
+  Stax.Fire({ name = "PluginManager", action = "Added" }, plugin)
 end
 
 --- Removes a plugin from the plugin manager
 ---@param plugin StaxPlugin
 local function _remove(plugin)
   Manager.Plugins[plugin.Data.Key] = nil
-  TriggerEvent("Stax::Server::PluginRemoved", plugin)
+  Stax.Fire({ name = "PluginManager", action = "Removed" }, plugin)
 end
 
 --- Fetches plugin from plugins key index
@@ -61,10 +61,12 @@ local function onResourceStop(resource)
   end
 end
 
-AddEventHandler("onResourceStart", onResourceStart)
-AddEventHandler("onResourceStop", onResourceStop)
+--- STAX EVENTS
+Stax.BaseEvent("onResourceStart", onResourceStart)
+Stax.BaseEvent("onResourceStop", onResourceStop)
 
-exports("PluginManager_Add", _add)
-exports("PluginManager_Remove", _remove)
-exports("PluginManager_Fetch", _fetchKey)
-exports("PluginManager_FetchResource", _fetchResource)
+--- STAX EXPORTS
+Stax.Export("PluginManager_Add", _add)
+Stax.Export("PluginManager_Remove", _remove)
+Stax.Export("PluginManager_Fetch", _fetchKey)
+Stax.Export("PluginManager_FetchResource", _fetchResource)

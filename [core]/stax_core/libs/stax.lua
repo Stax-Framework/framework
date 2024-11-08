@@ -178,7 +178,7 @@ end
 function StaxComponent.FetchAsync(name)
   local p = promise.new()
 
-  TriggerEvent("Stax::Shared::GetComponent", name, function(component)
+  Stax.Fire({ name = "Components", action = "GetComponents" }, function(component)
     return p:resolve(component)
   end)
 
@@ -191,7 +191,7 @@ end
 function StaxComponent.FetchDataAsync(name)
   local p = promise.new()
 
-  TriggerEvent("Stax::Shared::GetComponentDetails", name, function(component)
+  Stax.Fire({ name = "Components", action = "GetDetails" }, function(component)
     return p:resolve(component)
   end)
 
@@ -203,7 +203,7 @@ end
 ---@param name string Component Name
 ---@param result fun(component: T)
 function StaxComponent.Fetch(name, result)
-  TriggerEvent("Stax::Shared::GetComponent", name, function(component)
+  Stax.Fire({ name = "Components", action = "GetComponents" }, name, function(component)
     result(component)
   end)
 end
@@ -212,7 +212,7 @@ end
 ---@param name string Component Name
 ---@param result fun(component: StaxComponentDetails)
 function StaxComponent.FetchData(name, result)
-  TriggerEvent("Stax::Shared::GetComponentDetails", name, function(details)
+  Stax.Fire({ name = "Components", action = "GetDetails" }, name, function(details)
     result(details)
   end)
 end
@@ -223,12 +223,12 @@ end
 function StaxComponent.Register(component, request)
   assert(component.COMPONENT ~= nil, "Failed to register component because ^1`COMPONENT`^0 is not defined")
 
-  AddEventHandler("Stax::Shared::GetComponentDetails", function(name, next)
+  Stax.Event({ name = "Components", action = "GetDetails" }, function(name, next)
     if name ~= component.COMPONENT.NAME then return end
     next(component.COMPONENT)
   end)
-
-  AddEventHandler("Stax::Shared::GetComponent", function(name, next)
+  
+  Stax.Event({ name = "Components", action = "GetComponent" }, function(name, next)
     if name ~= component.COMPONENT.NAME then return end
     next(component)
   end)
@@ -279,29 +279,27 @@ function Stax.Init(self)
   local function HandleResourceStart(resource)
     if self._Resource ~= resource then return end
 
-    if Stax.Server() then
-      TriggerEvent("Stax::Server::ResourceStarted", resource)
-    else
-      TriggerEvent("Stax::Client::ResourceStarted", resource)
-    end
+    Stax.Fire({ name = "Core", action = "ResourceStarted" }, resource)
   end
 
   if Stax.Server() then
-    AddEventHandler("onServerResourceStart", HandleResourceStart)
+    Stax.BaseEvent("onServerResourceStart", HandleResourceStart)
   else
-    AddEventHandler("onClientResourceStart", HandleResourceStart)
+    Stax.BaseEvent("onClientResourceStart", HandleResourceStart)
   end
 
   local configLoaded = false
   local localeLoaded = false
 
   Stax.LoadConfig(self, function()
-    TriggerEvent("Stax::Shared::ConfigsLoaded")
+    Stax.Fire({ name = "Configs", action = "Loaded" })
+
     configLoaded = true
   end)
 
   Stax.LoadLocale(self, function()
-    TriggerEvent("Stax::Shared::LocalesLoaded")
+    Stax.Fire({ name = "Locales", action = "Loaded" })
+
     localeLoaded = true
   end)
 
@@ -310,7 +308,7 @@ function Stax.Init(self)
       Citizen.Wait(1000)
     until configLoaded == true and localeLoaded == true
 
-    TriggerEvent("Stax::Shared::Ready")
+    Stax.Fire({ name = "Core", action = "Ready" })
   end)
 end
 
@@ -363,15 +361,15 @@ function Stax.LoadConfig(self, loaded)
     Stax.Config = StaxConfig.Init(configs)
 
     if event then
-      RemoveEventHandler(event)
       loaded()
+      event.remove()
     end
   end
 
   if Stax.Server() then
-    event = AddEventHandler("Stax::Shared::LoadConfigs", _load)
+    event = Stax.Event({ name = "Configs", action = "Load" }, _load)
   else
-    event = RegisterNetEvent("Stax::Shared::LoadConfigs", _load)
+    event = Stax.RemoteEvent({ name = "Configs", "Load" }, _load)
   end
 end
 
@@ -382,28 +380,131 @@ function Stax.LoadLocale(self, loaded)
     Stax.Locale = StaxLocale.Init(locales)
 
     if event then
-      RemoveEventHandler(event)
+      event.remove()
       loaded()
     end
   end
 
   if Stax.Server() then
-    event = AddEventHandler("Stax::Shared::LoadLocales", _load)
+    event = Stax.Event({ name = "Locales", action = "Load" }, _load)
   else
-    event = RegisterNetEvent("Stax::Shared::LoadLocales", _load)
+    event = Stax.RemoteEvent({ name = "Locales", "Load" }, _load)
   end
 end
 
 function Stax.OnConfigsLoaded(callback)
-  AddEventHandler("Stax::Shared::ConfigsLoaded", callback)
+  Stax.Event({ name = "Configs", action = "Loaded" }, callback)
 end
 
 function Stax.OnLocalesLoaded(callback)
-  AddEventHandler("Stax::Shared::LocalesLoaded", callback)
+  Stax.Event({ name = "Locales", "Loaded" }, callback)
 end
 
 function Stax.Ready(callback)
-  AddEventHandler("Stax::Shared::Ready", callback)
+  Stax.Event({ name = "Core", action = "Ready" }, callback)
+end
+
+function Stax.Export(name, callback)
+  return exports(name, callback)
+end
+
+function Stax.BaseEvent(event, callback)
+  local eventHandler = AddEventHandler(event, callback)
+
+  return {
+    remove = function()
+      if not eventHandler then return end
+      RemoveEventHandler(eventHandler)
+    end
+  }
+end
+
+--- Creates a local event handler
+---@param eventData { name: string, action: string }
+---@param callback fun(...)
+---@return { remove: fun() }
+function Stax.Event(eventData, callback)
+  local eventName = tostring("Stax::" .. eventData.name .. "::" .. eventData.action)
+  local eventHandler = AddEventHandler(eventName, callback)
+
+  return {
+    remove = function()
+      if not eventHandler then return end
+      RemoveEventHandler(eventHandler)
+    end
+  }
+end
+
+--- Fires a local event handler
+---@param eventData { name: string, action: string }
+---@param ... any
+function Stax.Fire(eventData, ...)
+  local eventName = tostring("Stax::" .. eventData.name .. "::" .. eventData.action)
+  TriggerEvent(eventName, ...)
+end
+
+--- REMOTE EVENT | "Stax::Name::Scope::Action"
+
+--- Creates a remote event handler
+---@param eventData { name: string, action: string }
+---@param callback fun(...)
+---@return { remove: fun() }
+function Stax.RemoteEvent(eventData, callback)
+  local _scope = "Client"
+
+  if Stax.Server() then
+    _scope = "Server"
+  end
+
+  local eventName = tostring("Stax::" .. eventData.name .. "::" .. _scope .. "::" .. eventData.action)
+  RegisterNetEvent(eventName)
+  local eventHandler = AddEventHandler(eventName, callback)
+
+  return {
+    remove = function()
+      RemoveEventHandler(eventHandler)
+    end
+  }
+end
+
+--- Fires a client event from the server
+---@param eventData { name: string, action: string }
+---@param player number
+function Stax.FireClient(eventData, player, ...)
+  if Stax.Client() then return end
+  local eventName = tostring("Stax::" .. eventData.name .. "::Client::" .. eventData.action)
+
+  TriggerClientEvent(eventName, player, ...)
+end
+
+--- Fires a client event from the server on all players
+---@param eventData { name: string, action: string }
+function Stax.FireAllClients(eventData, ...)
+  if Stax.Client() then return end
+  local eventName = tostring("Stax::" .. eventData.name .. "::Client::" .. eventData.action)
+
+  TriggerClientEvent(eventName, -1, ...)
+end
+
+--- Fires a client event from the server on specified players
+---@param eventData { name: string, action: string }
+---@param players table<number>
+function Stax.FireClientList(eventData, players, ...)
+  if Stax.Client() then return end
+  local eventName = tostring("Stax::" .. eventData.name .. "::Client::" .. eventData.action)
+
+  for _, player in pairs(players) do
+    TriggerClientEvent(eventName, player, ...)
+  end
+end
+
+--- Fires a server event from the client
+---@param eventData { name: string, action: string }
+function Stax.FireServer(eventData, ...)
+  if Stax.Server() then return end
+  local eventName = tostring("Stax::" .. eventData.name .. "::Server::" .. eventData.action)
+
+  TriggerServerEvent(eventName, ...)
 end
 
 Stax.Init(Stax)

@@ -181,7 +181,7 @@ function Plugin.FetchConfigs(self)
     end
   end
 
-  TriggerEvent("Stax::Shared::LoadConfigs", configs)
+  Stax.Fire("Stax::Shared::LoadConfigs", configs)
 
   Plugin.Logger.Success("Plugin.FetchConfigs", "End Of Fetching Configs")
 
@@ -224,7 +224,7 @@ function Plugin.FetchLocales(self, locale)
     end
   end
 
-  TriggerEvent("Stax::Shared::LoadLocales", locales)
+  Stax.Fire("Stax::Shared::LoadLocales", locales)
 
   return locales
 end

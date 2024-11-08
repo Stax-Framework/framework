@@ -30,6 +30,7 @@ Stax.Ready(function()
   Manager.Logger = Stax.RequireAsync("Logger")
 end)
 
-exports("PlayerManager_Add", _add)
-exports("PlayerManager_Remove", _remove)
-exports("PlayerManager_Fetch", _fetch)
+--- STAX EXPORTS
+Stax.Export("PlayerManager_Add", _add)
+Stax.Export("PlayerManager_Remove", _remove)
+Stax.Export("PlayerManager_Fetch", _fetch)

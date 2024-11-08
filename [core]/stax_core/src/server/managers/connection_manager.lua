@@ -102,10 +102,11 @@ Stax.Ready(function()
     Manager.Player = Stax.RequireAsync("Player")
     Manager.Logger = Stax.RequireAsync("Logger")
 
-    AddEventHandler("playerConnecting", function(playerName, setKickReason, deferrals)
+    Stax.BaseEvent("playerConnecting", function(playerName, setKickReason, deferrals)
         Manager.Connecting(source, playerName, setKickReason, deferrals)
     end)
-    AddEventHandler("playerJoining", function(source, oldId)
+
+    Stax.BaseEvent("playerJoining", function(source, oldId)
         Manager.Join(source, oldId)
     end)
 
