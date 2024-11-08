@@ -440,6 +440,7 @@ end
 ---@param ... any
 function Stax.Fire(eventData, ...)
   local eventName = tostring("Stax::" .. eventData.name .. "::" .. eventData.action)
+
   TriggerEvent(eventName, ...)
 end
 
