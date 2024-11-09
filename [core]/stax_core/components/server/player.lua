@@ -21,7 +21,7 @@ Player.__index = Player
 ---@param source string | number
 ---@return StaxPlayer
 function Player.Create(source)
-  local newPlayer = {
+  local newPlayer = setmetatable({
     Handle = source,
     Name = GetPlayerName(source),
     Identifiers = {},
@@ -33,12 +33,11 @@ function Player.Create(source)
       kicks = {},
       warns = {}
     }
-  }
-  setmetatable(newPlayer, Player)
+  }, Player)
 
   --- LICENSE IS HARDCODED HERE (POSSIBLE CONFIG TO DETERMINE WHICH IDENTIFIER TO USE)
-  newPlayer.identifiers = Player.GetIdentifiers(newPlayer, { "license" })
-  newPlayer.Data.identifier = newPlayer.identifiers["license"]
+  newPlayer.Identifiers = Player.GetIdentifiers(newPlayer, { "license" })
+  newPlayer.Data.identifier = newPlayer.Identifiers["license"]
 
   newPlayer.Logger.Success("Player.Create", "Created Player: " .. newPlayer.Name)
 
@@ -163,6 +162,5 @@ end)
 Stax.Ready(function()
   if not Player.Groups then
     Player.Groups = Stax.Config:Fetch("groups")
-    Player.Logger.Unpack("Player.Groups.Config.READY????", Player.Groups, true)
   end
 end)
