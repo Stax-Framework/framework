@@ -1,0 +1,53 @@
+---[[
+--- SCRIPTED BY Xander1998
+---]]
+
+fx_version 'cerulean'
+
+game 'gta5'
+
+description "STAX Framework Core"
+
+version '0.1_Alpha'
+
+author 'Xander1998'
+
+lua54 'yes'
+
+server_scripts {
+    ---[[
+    --- SOURCE FILES
+    ---]]
+    "source/server/**/*.lua",
+
+    ---[[
+    --- COMPONENT FILES
+    ---]]
+    "components/server/**/*.lua"
+}
+
+shared_scripts {
+    "libs/stax.lua",
+
+    ---[[
+    --- SOURCE FILES
+    ---]]
+    "source/shared/**/*.lua",
+
+    ---[[
+    --- COMPONENT FILES
+    ---]]
+    "components/shared/**/*.lua"
+}
+
+client_scripts {
+        ---[[
+    --- SOURCE FILES
+    ---]]
+    "source/client/**/*.lua",
+
+    ---[[
+    --- COMPONENT FILES
+    ---]]
+    "components/client/**/*.lua"
+}
