@@ -4,6 +4,11 @@ local _loading = false
 local _lastLoad = nil
 local _loadTimeout = 500
 
+---[[
+--- EVENTS
+---]]
+local EVENT_ComponentLoaderReady = Stax.Event("ComponentLoader", "Ready")
+
 ---@param component Component
 AddEventHandler("STAX::ComponentLoader::Register", function(component)
     _lastLoad = GetGameTimer()
@@ -50,5 +55,7 @@ function StartLoadThread()
         Stax.Component.Fetch("Logger", function(component)
             component.Success("ComponentLoader", "Finished Loading Components!")
         end)
+
+        EVENT_ComponentLoaderReady.fireLocal()
     end)
 end
