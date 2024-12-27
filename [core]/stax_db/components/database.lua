@@ -1,10 +1,12 @@
 local resource_name = GetCurrentResourceName()
 
+---@type Logger
+local _Logger
+
 ---@class Database
 ---@field COMPONENT Component
 local Database = {
-    COMPONENT = Stax.Component.Init("Database", { "Logger" }),
-    Logger = nil
+    COMPONENT = Stax.Component.Init("Database"),
 }
 
 --- Fetches a single document from the database
@@ -146,5 +148,13 @@ function Database.DeleteOne(params, push)
         return push(deleteCount)
     end)
 end
+
+---[[
+--- LOADER EVENT
+---]]
+Stax.Event("ComponentLoader", "Ready").create(false, function()
+    ---@type Logger
+    _Logger = Stax.Component.FetchAsync("Logger")
+end)
 
 Stax.Component.Register(Database)
