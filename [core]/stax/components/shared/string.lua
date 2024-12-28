@@ -69,4 +69,7 @@ function String.StripInvalid(str)
     return str
 end
 
+---[[
+--- REGISTER COMPONENT
+---]]
 Stax.Component.Register(String)

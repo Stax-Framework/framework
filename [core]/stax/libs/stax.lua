@@ -48,7 +48,6 @@ function Component.FetchAsync(name)
     ---@param component Component
     Component.Fetch(name, function(component)
         p:resolve(component)
-        print("Fetched Component | " .. component.COMPONENT.Name)
     end)
 
     return Citizen.Await(p)

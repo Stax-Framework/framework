@@ -37,13 +37,14 @@ local function _fetch(playerId)
     return player
 end
 
----[[
---- LOADER EVENT
----]]
-Stax.Event("ComponentLoader", "Ready").create(false, function()
-    ---@type Logger
+local function _loadComponents()
     _Logger = Stax.Component.FetchAsync("Logger")
-end)
+end
+
+---[[
+--- EVENTS
+---]]
+Stax.Event("ComponentLoader", "Ready").create(false, _loadComponents)
 
 ---[[
 --- EXPORTS

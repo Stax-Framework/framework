@@ -27,6 +27,15 @@ server_scripts {
 }
 
 shared_scripts {
+    ---[[
+    --- CONFIG / LOCALE
+    ---]]
+    "config.lua",
+    "locale.lua",
+
+    ---[[
+    --- STAX LIB
+    ---]]
     "libs/stax.lua",
 
     ---[[

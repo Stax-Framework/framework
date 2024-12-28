@@ -38,4 +38,7 @@ function Logger.Unpack(name, data, pretty)
     print("----------------------------------------------------------")
 end
 
+---[[
+--- REGISTER COMPONENT
+---]]
 Stax.Component.Register(Logger)

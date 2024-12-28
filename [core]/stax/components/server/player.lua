@@ -13,6 +13,7 @@ local Player = {
 
 --- Creates a new instance of a player
 ---@param playerId string | number
+---@return Player | nil
 function Player.new(playerId)
     local newPlayer = setmetatable({
         _id = nil,
@@ -30,14 +31,17 @@ function Player.new(playerId)
     local identifierCount = GetNumPlayerIdentifiers(playerId)
     local foundPrimaryIdentifier = false
 
-    for i = 1, #identifierCount do
+    for i = 1, identifierCount - 1 do
         local identifier = GetPlayerIdentifier(playerId, i)
-        local colonPos = string.find(identifier, ":") - 1
-        local identifierType = string.sub(identifier, 1, colonPos)
-        identifiers[identifierType] = identifier
 
-        if identifierType == PrimaryIdentifier then
-            foundPrimaryIdentifier = true
+        if identifier then
+            local colonPos = string.find(identifier, ":") - 1
+            local identifierType = string.sub(identifier, 1, colonPos)
+            identifiers[identifierType] = identifier
+
+            if identifierType == PrimaryIdentifier then
+                foundPrimaryIdentifier = true
+            end
         end
     end
 
@@ -120,11 +124,16 @@ function Player.Warn()
 
 end
 
----[[
---- LOADER EVENT
----]]
-Stax.Event("ComponentLoader", "Ready").create(false, function()
+local function _loadComponents()
     _Database = Stax.Component.FetchAsync("Database")
-end)
+end
 
+---[[
+--- EVENTS
+---]]
+Stax.Event("ComponentLoader", "Ready").create(false, _loadComponents)
+
+---[[
+--- REGISTER COMPONENT
+---]]
 Stax.Component.Register(Player)

@@ -53,4 +53,7 @@ function Table.Map(t, type, returnType, mapping)
     return newTable
 end
 
+---[[
+--- REGISTER COMPONENT
+---]]
 Stax.Component.Register(Table)

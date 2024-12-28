@@ -21,4 +21,7 @@ function PlayerManager.Fetch(playerId)
     return exports.stax:PlayerManager_Fetch(playerId)
 end
 
+---[[
+--- REGISTER COMPONENT
+---]]
 Stax.Component.Register(PlayerManager)
