@@ -13,20 +13,30 @@ local _ConnectingStates = {
 }
 
 local Manager = {
-    Players = {}
+    PlayerInstances = {},
+    QueuedPlayers = {}
 }
 
 local function _connecting(playerName, setKickReason, deferrals)
+    Citizen.Wait(1)
+
     local src = source
+    local playerInstance = _Player.new(src)
 
-    ---[[
-    --- ADD CONNECTION LOGIC CHECKS
-    --- ADD QUEUE CONNECTION SYSTEM
-    ---]]
+    deferrals.update("Initializing Player Instance!")
 
-    deferrals.done()
+    if playerInstance then
+        deferrals.update("Player Instance Initialized!")
+    else
+        deferrals.done("Couldn't initialize player instance!")
+    end
+
+    -- TODO: ADD CONNECTION LOGIC CHECKS
+    -- TODO: ADD QUEUE CONNECTION SYSTEM
 
     print(playerName .. " is connecting to the server!")
+
+    deferrals.done("Stopping you from joining here...")
 end
 
 ---@param newSource string
@@ -36,11 +46,7 @@ local function _joined(newSource, oldSource)
 
     print(GetPlayerName(src) .. " is joining the server!")
 
-    local playerInstance = _Player.new(newSource)
 
-    if playerInstance then
-        _PlayerManager.Add(playerInstance)
-    end
 end
 
 local function _loadComponents()

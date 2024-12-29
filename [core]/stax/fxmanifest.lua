@@ -14,18 +14,6 @@ author 'Xander1998'
 
 lua54 'yes'
 
-server_scripts {
-    ---[[
-    --- SOURCE FILES
-    ---]]
-    "source/server/**/*.lua",
-
-    ---[[
-    --- COMPONENT FILES
-    ---]]
-    "components/server/**/*.lua"
-}
-
 shared_scripts {
     ---[[
     --- CONFIG / LOCALE
@@ -47,6 +35,23 @@ shared_scripts {
     --- COMPONENT FILES
     ---]]
     "components/shared/**/*.lua"
+}
+
+server_scripts {
+    ---[[
+    --- SERVER CONFIG
+    ---]]
+    "serverConfig.lua",
+
+    ---[[
+    --- SOURCE FILES
+    ---]]
+    "source/server/**/*.lua",
+
+    ---[[
+    --- COMPONENT FILES
+    ---]]
+    "components/server/**/*.lua"
 }
 
 client_scripts {

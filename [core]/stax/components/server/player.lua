@@ -20,7 +20,8 @@ function Player.new(playerId)
         source = playerId,
         name = GetPlayerName(playerId),
         identifier = nil,
-        identifers = {}
+        identifers = {},
+        whitelisted = false
     }, Player)
 
     ---[[
@@ -112,16 +113,99 @@ function Player.Save(self)
     }
 end
 
-function Player.Ban()
+--- Bans the player from the server with an admin player check
+---@param self Player
+---@param admin Player
+---@return {} | nil
+function Player.Ban(self, admin)
+    if not admin then
+        return
+    end
 
+    -- TODO: CHECK ADMIN PLAYER PERMISSIONS
+    local banData = {}
+
+    return {
+        sync = function(callback)
+            _Database.InsertOne({ collection = "player_bans", document = banData }, function(insertCount, insertedIds)
+                callback(insertCount, insertedIds)
+            end)
+        end,
+        async = function()
+            local p = promise.new()
+
+            _Database.InsertOne({ collection = "player_bans", document = banData }, function(insertCount, insertedIds)
+                p:resolve(insertCount, insertedIds)
+            end)
+
+            return Citizen.Await(p)
+        end
+    }
 end
 
-function Player.Kick()
+--- Kicks the player from the server with an admin player check
+---@param self Player
+---@param admin Player
+---@return {} | nil
+function Player.Kick(self, admin)
+    if not admin then
+        return
+    end
 
+    -- TODO: CHECK ADMIN PLAYER PERMISSIONS
+
+    return {
+        sync = function()
+
+        end,
+        async = function()
+
+        end
+    }
 end
 
-function Player.Warn()
+--- Warns the player with a notification with an admin player check
+---@param self Player
+---@param admin Player
+---@return {} | nil
+function Player.Warn(self, admin)
+    if not admin then
+        return
+    end
 
+    -- TODO: CHECK ADMIN PLAYER PERMISSIONS
+    return {
+        sync = function()
+
+        end,
+        async = function()
+
+        end
+    }
+end
+
+--- Fetches the players bans
+function Player.FetchBans(self)
+    return {
+        sync = function()
+
+        end,
+        async = function()
+
+        end
+    }
+end
+
+--- Fetches if the player is whitelisted for the server
+function Player.IsWhitelisted(self)
+    return {
+        sync = function()
+
+        end,
+        async = function()
+
+        end
+    }
 end
 
 local function _loadComponents()

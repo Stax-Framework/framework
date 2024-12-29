@@ -16,7 +16,7 @@ function Database.IsConnected(push)
     push(exports[resource_name]:isConnected())
 end
 
---- Inserts documents into the database
+--- Inserts multiple documents into the database
 ---@async
 ---@param params { collection: string, documents: table, options: table? }
 ---@param push fun(insertCount: number, insertedIds: {})
@@ -33,7 +33,7 @@ end
 
 --- Inserts one document into the database
 ---@async
----@params { collection: string, document: table, options: table? }
+---@param params { collection: string, document: table, options: table? }
 ---@param push fun(insertCount: number, insertedIds: {})
 function Database.InsertOne(params, push)
     exports[resource_name]:insertOne(params, function(success, insertCount, insertedIds)
@@ -46,7 +46,7 @@ function Database.InsertOne(params, push)
     end)
 end
 
---- Fetches documents from the database
+--- Fetches multiple documents from the database
 ---@async
 ---@param params { collection: string, query: table, options: table? }
 ---@param push fun(results: table)
@@ -76,7 +76,7 @@ function Database.FindOne(params, push)
     end)
 end
 
---- Fetches a single document from the database
+--- Updates multiple documents in the database
 ---@async
 ---@param params { collection: string, query: table, update: table, options: table? }
 ---@param push fun(updatedCount: number)
@@ -91,7 +91,7 @@ function Database.Update(params, push)
     end)
 end
 
---- Fetches a single document from the database
+--- Updates a single document in the database
 ---@async
 ---@param params { collection: string, query: table, update: table, options: table? }
 ---@param push fun(updatedCount: number)
@@ -106,7 +106,7 @@ function Database.UpdateOne(params, push)
     end)
 end
 
---- Fetches a single document from the database
+--- Fetches a count of results from the database
 ---@async
 ---@param params { collection: string, query: table, options: table? }
 ---@param push fun(count: number)
@@ -121,7 +121,7 @@ function Database.Count(params, push)
     end)
 end
 
---- Deletes documents from the database
+--- Deletes multiple documents from the database
 ---@async
 ---@param params { collection: string, query: table, options: table? }
 ---@param push fun(deletedCount: number)
