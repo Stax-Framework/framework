@@ -7,6 +7,7 @@ local _Database
 ---@field name string Players username when connecting to the server
 ---@field identifier string Primary identifier used to query the database
 ---@field identifiers { [string]: string } Extra identifier storage for possible ban evade logic
+---@field whitelisted boolean If the player is whitelisted to play on the server or not
 local Player = {
     COMPONENT = Stax.Component.Init("Player")
 }
@@ -116,7 +117,7 @@ end
 --- Bans the player from the server with an admin player check
 ---@param self Player
 ---@param admin Player
----@return {} | nil
+---@return { sync: fun(callback: fun(results: { insertCount: number, insertedIds: table })), async: fun(): { insertCount: number, insertedIds: table } } | nil
 function Player.Ban(self, admin)
     if not admin then
         return
@@ -127,9 +128,7 @@ function Player.Ban(self, admin)
 
     return {
         sync = function(callback)
-            _Database.InsertOne({ collection = "player_bans", document = banData }, function(insertCount, insertedIds)
-                callback(insertCount, insertedIds)
-            end)
+            _Database.InsertOne({ collection = "player_bans", document = banData }, callback)
         end,
         async = function()
             local p = promise.new()
@@ -153,13 +152,25 @@ function Player.Kick(self, admin)
     end
 
     -- TODO: CHECK ADMIN PLAYER PERMISSIONS
+    local kickData = {}
+
+    -- insertCount: number, insertedIds: table
 
     return {
-        sync = function()
-
+        sync = function(callback)
+            _Database.InsertOne({ collection = "player_kicks", document = kickData }, callback)
         end,
         async = function()
+            local p = promise.new()
 
+            _Database.InsertOne({ collection = "player_kicks", document = kickData }, function(insertCount, insertedIds)
+                p:resolve({
+                    insertCount = insertCount,
+                    insertedIds = insertedIds
+                })
+            end)
+
+            return Citizen.Await(p)
         end
     }
 end
@@ -174,12 +185,23 @@ function Player.Warn(self, admin)
     end
 
     -- TODO: CHECK ADMIN PLAYER PERMISSIONS
-    return {
-        sync = function()
+    local warnData = {}
 
+    return {
+        sync = function(callback)
+            _Database.InsertOne({ collection = "player_warns", document = warnData }, callback)
         end,
         async = function()
+            local p = promise.new()
 
+            _Database.InsertOne({ collection = "player_warns", document = warnData }, function(insertCount, insertedIds)
+                p:resolve({
+                    insertCount = insertCount,
+                    insertedIds = insertedIds
+                })
+            end)
+
+            return Citizen.Await(p)
         end
     }
 end
@@ -187,23 +209,17 @@ end
 --- Fetches the players bans
 function Player.FetchBans(self)
     return {
-        sync = function()
-
+        sync = function(callback)
+            _Database.Find({ collection = "player_bans", query = { player_id = self._id } }, callback)
         end,
         async = function()
+            local p = promise.new()
 
-        end
-    }
-end
+            _Database.Find({ collection = "player_bans", query = { player_id = self._id } }, function (results)
+                p:resolve(results)
+            end)
 
---- Fetches if the player is whitelisted for the server
-function Player.IsWhitelisted(self)
-    return {
-        sync = function()
-
-        end,
-        async = function()
-
+            return Citizen.Await(p)
         end
     }
 end
