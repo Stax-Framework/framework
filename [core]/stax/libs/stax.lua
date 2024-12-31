@@ -41,7 +41,7 @@ end
 --- Fetches a component synchronously through callback
 ---@generic T
 ---@param name string
----@return Promise<Component<T>>
+---@return promise<Component<T>>
 function Component.FetchAsync(name)
     local p = promise.new()
 
