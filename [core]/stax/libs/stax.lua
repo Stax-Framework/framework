@@ -1,3 +1,9 @@
+---@class Config
+_Config = {}
+
+---@class Locale
+_Locale = {}
+
 ---@class ComponentDetails
 ---@field Name string
 ---@field Requirements string[]
@@ -194,6 +200,117 @@ function Stax.NetworkCallback(name)
             end
         end
     }
+end
+
+--- Fetches a value or table from config
+---@param path string | nil Community.Table1.Table2.ValueKey = Community = { Table1 = { Table2 = { ValueKey = 'Hello World' } } }
+---@param default any Default value that should be returned if nothing is found
+function Stax.FetchConfig(path, default)
+    if path == nil then
+        return _Config
+    end
+
+    local function loadStepper(currentData, nextIndex)
+        return currentData[nextIndex]
+    end
+
+    local function stringSplit(passed, sep)
+        if sep == nil then
+            sep = "%s"
+        end
+        local t = {}
+        for str in string.gmatch(passed, "([^" .. sep .. "]+)") do
+            table.insert(t, str)
+        end
+        return t
+    end
+
+    local splitPath = stringSplit(path, ".")
+
+    if type(splitPath) == "table" then
+        local lastStep
+
+        if #splitPath > 1 then
+            for _, key in pairs(splitPath) do
+                local currentStep = loadStepper(_Config, key)
+
+                if currentStep == nil then
+                    if lastStep and lastStep[key] then
+                        return lastStep[key]
+                    end
+                else
+                    lastStep = currentStep
+                end
+            end
+        else
+            local currentStep = _Config[splitPath[1]]
+
+            if currentStep then
+                return currentStep
+            else
+                return default
+            end
+        end
+    end
+end
+
+--- Fetches a value or language from the locale file
+---@param lang string Example: `en` `fr`
+---@param path string | nil Community.Table1.Table2.ValueKey = Community = { Table1 = { Table2 = { ValueKey = 'Hello World' } } }
+---@param default any Default value that should be returned if nothing is found
+---@return table | nil
+function Stax.FetchLocale(lang, path, default)
+    if not lang then
+        error("[STAX]: Couldn't use Stax.FetchLocale because paramater `lang` was not defined!")
+        return
+    end
+
+    if not path then
+        return _Locale[lang]
+    end
+
+    local function loadStepper(currentData, nextIndex)
+        return currentData[nextIndex]
+    end
+
+    local function stringSplit(passed, sep)
+        if sep == nil then
+            sep = "%s"
+        end
+        local t = {}
+        for str in string.gmatch(passed, "([^" .. sep .. "]+)") do
+            table.insert(t, str)
+        end
+        return t
+    end
+
+    local splitPath = stringSplit(path, ".")
+
+    if type(splitPath) == "table" then
+        local lastStep
+
+        if #splitPath > 1 then
+            for _, key in pairs(splitPath) do
+                local currentStep = loadStepper(_Locale[lang], key)
+
+                if currentStep == nil then
+                    if lastStep and lastStep[key] then
+                        return lastStep[key]
+                    end
+                else
+                    lastStep = currentStep
+                end
+            end
+        else
+            local currentStep = _Locale[lang][splitPath[1]]
+
+            if currentStep then
+                return currentStep
+            else
+                return default
+            end
+        end
+    end
 end
 
 function Stax.Export(name, callback)
