@@ -1,5 +1,1 @@
-_Config = {
-    Player = {
-        PrimaryIdentifier = "discord"
-    }
-}
+_Config.EnableRespawn = false
