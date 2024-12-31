@@ -81,7 +81,7 @@ end
 function Database.Insert(params, push)
     exports[resource_name]:insert(params, function(success, insertCount, insertedIds)
         if not success then
-            -- Database.Logger.Error("[stax_db] | Insert |", tostring(insertCount))
+            _Logger.Error("[stax_db] | Insert |", tostring(insertCount))
             return push(0, {})
         end
 
@@ -96,7 +96,7 @@ end
 function Database.InsertOne(params, push)
     exports[resource_name]:insertOne(params, function(success, insertCount, insertedIds)
         if not success then
-            -- Database.Logger.Error("[stax_db] | InsertOne |", tostring(insertCount))
+            _Logger.Error("[stax_db] | InsertOne |", tostring(insertCount))
             return push(0, {})
         end
 
@@ -111,7 +111,7 @@ end
 function Database.Find(params, push)
     exports[resource_name]:find(params, function(success, result)
         if not success then
-            -- Database.Logger.Error("[stax_db] | Find |", tostring(result))
+            _Logger.Error("[stax_db] | Find |", tostring(result))
             return push({})
         end
 
@@ -126,7 +126,7 @@ end
 function Database.FindOne(params, push)
     exports[resource_name]:findOne(params, function(success, result)
         if not success then
-            -- Database.Logger.Error("[stax_db] | FindOne |", tostring(result))
+            _Logger.Error("[stax_db] | FindOne |", tostring(result))
             return push({})
         end
 
@@ -141,7 +141,7 @@ end
 function Database.Update(params, push)
     exports[resource_name]:update(params, function(success, updatedCount)
         if not success then
-            -- Database.Logger.Error("[stax_db] | Update |", tostring(updatedCount))
+            _Logger.Error("[stax_db] | Update |", tostring(updatedCount))
             return push(0)
         end
 
@@ -156,7 +156,7 @@ end
 function Database.UpdateOne(params, push)
     exports[resource_name]:update(params, function(success, updatedCount)
         if not success then
-            -- Database.Logger.Error("[stax_db] | UpdateOne |", tostring(updatedCount))
+            _Logger.Error("[stax_db] | UpdateOne |", tostring(updatedCount))
             return push(0)
         end
 
@@ -171,7 +171,7 @@ end
 function Database.Count(params, push)
     exports[resource_name]:count(params, function(success, count)
         if not success then
-            -- Database.Logger.Error("[stax_db] | UpdateOne |", tostring(count))
+            _Logger.Error("[stax_db] | UpdateOne |", tostring(count))
             return push(0)
         end
 
@@ -186,7 +186,7 @@ end
 function Database.Delete(params, push)
     exports[resource_name]:delete(params, function(success, deleteCount)
         if not success then
-            -- Database.Logger.Error("[stax_db] | UpdateOne |", tostring(deleteCount))
+            _Logger.Error("[stax_db] | UpdateOne |", tostring(deleteCount))
             return push(0)
         end
         return push(deleteCount)
@@ -200,7 +200,7 @@ end
 function Database.DeleteOne(params, push)
     exports[resource_name]:deleteOne(params, function(success, deleteCount)
         if not success then
-            -- Database.Logger.Error("[stax_db] | UpdateOne |", tostring(deleteCount))
+            _Logger.Error("[stax_db] | UpdateOne |", tostring(deleteCount))
             return push(0)
         end
         return push(deleteCount)
