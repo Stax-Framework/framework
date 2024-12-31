@@ -1,3 +1,4 @@
+---@diagnostic disable
 ---[[
 --- SCRIPTED BY Xander1998
 ---]]
