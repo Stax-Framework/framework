@@ -1,3 +1,3 @@
-_Config.Discord = {
-    Community = {}
+_Config.Player = {
+    PrimaryIdentifier = "discord"
 }
