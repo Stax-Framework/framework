@@ -17,15 +17,15 @@ lua54 'yes'
 
 shared_scripts {
     ---[[
-    --- CONFIG / LOCALE
-    ---]]
-    "config.lua",
-    "locale.lua",
-
-    ---[[
     --- STAX LIB
     ---]]
     "libs/stax.lua",
+
+    ---[[
+    --- SHARED CONFIG / LOCALE
+    ---]]
+    "config.lua",
+    "locale.lua",
 
     ---[[
     --- SOURCE FILES
