@@ -13,7 +13,6 @@ local _ConnectingStates = {
 }
 
 local Manager = {
-    PlayerInstances = {},
     QueuedPlayers = {}
 }
 
