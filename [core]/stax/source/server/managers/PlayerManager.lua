@@ -5,7 +5,7 @@ local Manager = {
     Players = {}
 }
 
----@param player Player
+---@param player StaxPlayer
 local function _add(player)
     if Manager.Players[player.source] then
         _Logger.Error("PlayerManager", "Couldn't add player [" .. player.source .. "] | " .. player.name .. " because they already exist!")
@@ -17,6 +17,7 @@ local function _add(player)
     _Logger.Success("PlayerManager", "Added player [" .. player.source .. "] | " .. player.name .. " to the manager!")
 end
 
+---@param playerId number
 local function _remove(playerId)
     if not Manager.Players[playerId] then
         _Logger.Error("PlayerManager", "Couldn't add player [" .. playerId .. "] | because they don't exist in the manager!")
@@ -26,6 +27,7 @@ local function _remove(playerId)
     table.remove(Manager.Players, playerId)
 end
 
+---@param playerId number
 local function _fetch(playerId)
     local player = Manager.Players[playerId]
 

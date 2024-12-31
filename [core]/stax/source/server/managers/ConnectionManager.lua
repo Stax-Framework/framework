@@ -2,7 +2,7 @@
 local _Logger
 ---@type PlayerManager
 local _PlayerManager
----@type Player
+---@type StaxPlayer
 local _Player
 
 local _ConnectingStates = {
@@ -19,7 +19,7 @@ local Manager = {
 local function _connecting(playerName, setKickReason, deferrals)
     Citizen.Wait(1)
 
-    local src = source
+    local src = tostring(source)
     local playerInstance = _Player.new(src)
 
     deferrals.update("Initializing Player Instance!")
