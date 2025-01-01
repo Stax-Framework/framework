@@ -1,3 +1,7 @@
 _Config.Player = {
-    PrimaryIdentifier = "discord"
+    PrimaryIdentifier = "license"
+}
+
+_Config.Server = {
+    Whitelisted = true
 }
