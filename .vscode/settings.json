@@ -3,7 +3,8 @@
         "${addons}/fivem/module/library"
     ],
     "Lua.runtime.nonstandardSymbol": [
-        "^="
+        "^=",
+        "|="
     ],
     "Lua.workspace.checkThirdParty": false
 }
