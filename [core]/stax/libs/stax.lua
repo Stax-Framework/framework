@@ -140,7 +140,6 @@ function Stax.NetworkCallback(name)
                     TriggerServerEvent(resultStr, msgpack.pack(data))
                 end, ...)
             end
-
         end)
 
         return function()
@@ -151,8 +150,8 @@ function Stax.NetworkCallback(name)
     end
 
     local function uuid()
-        local template ='xxxx-xx-xxxx'
-        return string.gsub(template, '[xy]', function (c)
+        local template = 'xxxx-xx-xxxx'
+        return string.gsub(template, '[xy]', function(c)
             local v = (c == 'x') and math.random(0, 0xf) or math.random(8, 0xb)
             return string.format('%x', v)
         end)
@@ -313,6 +312,108 @@ function Stax.FetchLocale(lang, path, default)
     end
 end
 
+--- Creates a new export for the script
+---@param name string
+---@param callback fun(...)
 function Stax.Export(name, callback)
     exports(name, callback)
+end
+
+--- Creates a new text command handler
+---@param commandName string
+---@param handler fun(source: number, args: table<any>, rawCommand: string) (`source` > 0) = PLAYER | (`source` == 0) = SERVER | `args` arguments after /command is send (/command test test1 hello) | `rawCommand` full command string
+---@param restricted boolean
+function Stax.Command(commandName, handler, restricted)
+    RegisterCommand(commandName, handler, restricted)
+end
+
+--- Creates a custom keybind that is editable by the user in the settings->controls in the pause menu
+---@param name string
+---@param description string
+---@param defaultMapper string https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/
+---@param defaultParameter string https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/
+---@param alternate? { defaultMapper: string, defaultParameter: string }
+function Stax.Keybind(name, description, defaultMapper, defaultParameter, alternate)
+    RegisterKeyMapping(tostring("+" .. name), description, defaultMapper, defaultParameter)
+
+    if alternate then
+        RegisterKeyMapping(tostring("~!+" .. name), description .. " | ALTERNATE", alternate.defaultMapper, alternate.defaultParameter)
+    end
+
+    return {
+        ---@param handler fun()
+        pressed = function(handler)
+            RegisterCommand(tostring("+" .. name), handler, false)
+        end,
+        ---@param handler fun()
+        released = function(handler)
+            RegisterCommand(tostring("-" .. name), handler, false)
+        end
+    }
+end
+
+---@param padIndex "PLAYER_CONTROL" | "CAMERA_CONTROL" | "FRONTEND_CONTROL"
+---@param control number?
+function Stax.Control(padIndex, control)
+    ---@enum PadType
+    local _PadType = {
+        ["PLAYER_CONTROL"] = 0,
+        ["CAMERA_CONTROL"] = 1,
+        ["FRONTEND_CONTROL"] = 2
+    }
+
+    return {
+        disableAll = function()
+            DisableAllControlActions(_PadType[padIndex])
+        end,
+        ---@param disable boolean
+        disable = function(disable)
+            if not control then return end
+            DisableControlAction(_PadType[padIndex], control, disable)
+        end,
+        enableAll = function()
+            EnableAllControlActions(_PadType[padIndex])
+        end,
+        ---@param enable boolean
+        enable = function(enable)
+            if not control then return end
+            EnableControlAction(_PadType[padIndex], control, enable)
+        end,
+        isEnabled = function()
+            if not control then return end
+            IsControlEnabled(_PadType[padIndex], control)
+        end,
+        isJustPressed = function()
+            if not control then return end
+            IsControlJustPressed(_PadType[padIndex], control)
+        end,
+        isJustReleased = function()
+            if not control then return end
+            IsControlJustReleased(_PadType[padIndex], control)
+        end,
+        isPressed = function()
+            if not control then return end
+            IsControlPressed(_PadType[padIndex], control)
+        end,
+        isReleased = function()
+            if not control then return end
+            IsControlReleased(_PadType[padIndex], control)
+        end,
+        isDisabledJustPressed = function()
+            if not control then return end
+            IsDisabledControlJustPressed(_PadType[padIndex], control)
+        end,
+        isDisabledJustReleased = function()
+            if not control then return end
+            IsDisabledControlJustReleased(_PadType[padIndex], control)
+        end,
+        isDisablePressed = function()
+            if not control then return end
+            IsDisabledControlPressed(_PadType[padIndex], control)
+        end,
+        isDisableReleased = function()
+            if not control then return end
+            IsDisabledControlReleased(_PadType[padIndex], control)
+        end
+    }
 end
