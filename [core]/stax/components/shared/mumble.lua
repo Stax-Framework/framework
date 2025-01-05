@@ -23,80 +23,133 @@ function Mumble.AddTargetPlayer(targetId, player)
     MumbleAddVoiceTargetPlayer(targetId, player)
 end
 
-function Mumble.AddTargetByServerId()
-
+--- Adds the specified player to the target list for the specified Mumble voice target ID.
+---@param targetId number A Mumble voice target ID, ranging from 1..30 (inclusive).
+---@param serverId number The player's server id.
+function Mumble.AddTargetByServerId(targetId, serverId)
+    MumbleAddVoiceTargetPlayerByServerId(targetId, serverId)
 end
 
+--- Clears mumble voice channel
 function Mumble.ClearChannel()
-
+    MumbleClearVoiceChannel()
 end
 
-function Mumble.ClearTarget()
-
+--- Clears the target list for the specified Mumble voice target ID.
+---@param targetId number A Mumble voice target ID, ranging from 1..30 (inclusive).
+function Mumble.ClearTarget(targetId)
+    MumbleClearVoiceTarget(targetId)
 end
 
-function Mumble.ClearTargetChannels()
-
+--- Clears channels from the target list for the specified Mumble voice target ID.
+---@param targetId number A Mumble voice target ID, ranging from 1..30 (inclusive).
+function Mumble.ClearTargetChannels(targetId)
+    MumbleClearVoiceTargetChannels(targetId)
 end
 
-function Mumble.ClearTargetPlayers()
-
+--- Clears players from the target list for the specified Mumble voice target ID.
+---@param targetId number A Mumble voice target ID, ranging from 1..30 (inclusive).
+function Mumble.ClearTargetPlayers(targetId)
+    MumbleClearVoiceTargetPlayers(targetId)
 end
 
-function Mumble.CreateChannel()
-
+--- Create a permanent voice channel.
+---@param id number ID of the channel.
+function Mumble.CreateChannel(id)
+    MumbleCreateChannel(id)
 end
 
-function Mumble.DoesChannelExist()
-
+--- Gets the clients speaking proximity
+---@return number
+function Mumble.GetTalkerProximity()
+    return MumbleGetTalkerProximity()
 end
 
-function Mumble.GetChannelFromServerId()
-
+--- Returns the mumble voice channel from a player's server id.
+---@param serverId number The player's server id.
+---@return number
+function Mumble.GetChannelFromServerId(serverId)
+    return MumbleGetVoiceChannelFromServerId(serverId)
 end
 
+--- If the player has their voice chat enabled
+---@return boolean # True if the player has enabled voice chat.
 function Mumble.IsActive()
-
+    return MumbleIsActive()
 end
 
+--- This native will return true if the user succesfully connected to the voice server. If the user disabled the voice-chat setting it will return false.
+---@return boolean # True if the player is connected to a mumble server.
 function Mumble.IsConnected()
-
+    return MumbleIsConnected()
 end
 
-function Mumble.IsPlayerMuted()
-
+--- Checks if the player is currently muted
+---@param playerSrc number The player to get the mute state for
+---@return boolean
+function Mumble.IsPlayerMuted(playerSrc)
+    return MumbleIsPlayerMuted(playerSrc)
 end
 
-function Mumble.IsPlayerTalking()
-
+--- Checks if the player is currently talking
+---@param player number The target player.
+---@return boolean
+function Mumble.IsPlayerTalking(player)
+    return MumbleIsPlayerTalking(player)
 end
 
-function Mumble.RemoveChannelListen()
-
+--- Stops listening to the specified channel.
+---@param channel number A game voice channel ID.
+function Mumble.RemoveChannelListen(channel)
+    MumbleRemoveVoiceChannelListen(channel)
 end
 
-function Mumble.RemoveTargetChannel()
-
+--- Check whether specified channel exists on the Mumble server.
+---@param channel number A game voice channel ID.
+---@return boolean # True if the specific channel exists. False otherwise.
+function Mumble.DoesChannelExist(channel)
+    return MumbleDoesChannelExist(channel)
 end
 
-function Mumble.RemoveTargetPlayer()
-
+--- Removes the specified voice channel from the user's voice targets.
+---@param targetId number A Mumble voice target ID, ranging from 1..30 (inclusive).
+---@param channel number The game voice channel ID to remove from the target.
+---@see Opposite https://docs.fivem.net/natives/?_0x4D386C9E
+function Mumble.RemoveTargetChannel(targetId, channel)
+    MumbleRemoveVoiceTargetChannel(targetId, channel)
 end
 
-function Mumble.RemoveTargetPlayerByServerId()
-
+--- Removes the specified player from the user's voice targets.
+---@param targetId number A Mumble voice target ID, ranging from 1..30 (inclusive).
+---@param player number The player index to remove from the target.
+function Mumble.RemoveTargetPlayer(targetId, player)
+    MumbleRemoveVoiceTargetPlayer(targetId, player)
 end
 
-function Mumble.SetActive()
-
+--- Removes the specified player from the user's voice targets.
+---@param targetId number A Mumble voice target ID, ranging from 1..30 (inclusive).
+---@param serverId number The player's server id to remove from the target.
+function Mumble.RemoveTargetPlayerByServerId(targetId, serverId)
+    MumbleRemoveVoiceTargetPlayerByServerId(targetId, serverId)
 end
 
-function Mumble.SetInputDistance()
-
+--- Sets mumble in an activated or deactivated state
+---@param state boolean
+function Mumble.SetActive(state)
+    MumbleSetActive(state)
 end
 
-function Mumble.SetInputIntent()
+--- Sets the current input distance. The player will be able to talk to other players within this distance.
+---@param distance number The input distance.
+function Mumble.SetInputDistance(distance)
+    MumbleSetAudioInputDistance(distance)
+end
 
+---Use this native to disable noise suppression and high pass filters.
+---The possible intents for this are as follows (backticks are used to represent hashes):
+---@param intentHash string | number `speech` Default Intent | `music` Disable noise suppression and high pass filter
+function Mumble.SetInputIntent(intentHash)
+    MumbleSetAudioInputIntent(intentHash)
 end
 
 --- Sets the current output distance. The player will be able to hear other players talking within this distance.
