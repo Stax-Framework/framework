@@ -1,4 +1,5 @@
 ---@class Mumble
+---@field COMPONENT Component
 local Mumble = {
     COMPONENT = Stax.Component.Init("Mumble")
 }
