@@ -4,7 +4,8 @@
     ],
     "Lua.runtime.nonstandardSymbol": [
         "^=",
-        "|="
+        "|=",
+        "`"
     ],
     "Lua.workspace.checkThirdParty": false
 }
