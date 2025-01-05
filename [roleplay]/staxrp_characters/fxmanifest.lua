@@ -15,6 +15,15 @@ author 'Xander1998'
 
 lua54 'yes'
 
+ui_page {
+    "ui/dist/index.html"
+}
+
+files {
+    "ui/dist/index.html",
+    "ui/dist/assets/*.*",
+}
+
 shared_scripts {
     ---[[
     --- STAX LIB
@@ -51,7 +60,7 @@ server_scripts {
 }
 
 client_scripts {
-        ---[[
+    ---[[
     --- SOURCE FILES
     ---]]
     "source/client/**/*.lua",
