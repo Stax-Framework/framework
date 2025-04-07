@@ -39,6 +39,7 @@ end
 --- Gets the NUI cursor position
 ---@return number, number
 function NUI.GetCursorPosition()
+    ---@diagnostic disable-next-line
     return GetNuiCursorPosition()
 end
 
@@ -58,3 +59,5 @@ end
 function NUI.ManualShutdownLoading(manualShutdown)
     SetManualShutdownLoadingScreenNui(manualShutdown)
 end
+
+Stax.Component.Register(NUI)
