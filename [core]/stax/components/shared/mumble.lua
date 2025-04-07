@@ -109,6 +109,7 @@ end
 ---@param channel number A game voice channel ID.
 ---@return boolean # True if the specific channel exists. False otherwise.
 function Mumble.DoesChannelExist(channel)
+    ---@diagnostic disable-next-line
     return MumbleDoesChannelExist(channel)
 end
 
